@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ce8464fab01e5074883aab5089a4227d
+timeCreated: 1445895160
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 48832
+  packageName: 'Basic UI Elements: Metal'
+  packageVersion: 1.0
+  assetPath: Assets/DualCorStudios/BasicUI Metal/Prefabs/Cancel.prefab
+  uploadId: 88538
