@@ -1,21 +1,48 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using static GameManager;
 
-public class UIManager : MonoBehaviour
+/// <summary>
+/// Control Button Scirpt
+/// </summary>
+
+public class ButtonManager : MonoBehaviour
 {
+    public GameManager gameManager;
+    public DeckManager deckManager;
+    public RecordManager recordManager;
+
+    // For panel activation control
     public GameObject infoPanel;
     public GameObject deckPanel;
     public GameObject recordPanel;
     public GameObject deckCreatePanel;
+
+    // Button Click Sound
     public AudioSource buttonClick;
 
-    void Start()
-    {
-        deckPanel.SetActive(false);
-        recordPanel.SetActive(false);
-    }
+    // Cached Data
+    private List<DeckPreset> cachedDecks = null;
+    private List<BattleRecord> cachedBattles = null;
 
+    // Deck Button
     public void DeckButton()
     {
+        if (cachedDecks != null)
+        {
+            deckManager.DisplayDeckList(cachedDecks);
+
+            return;
+        }
+
+        gameManager.FetchDeckPresets((deckList) =>
+        {
+            cachedDecks = deckList;
+
+            deckManager.DisplayDeckList(deckList);
+        });
+
         deckPanel.SetActive(true);
         infoPanel.SetActive(false);
         recordPanel.SetActive(false);
@@ -23,6 +50,7 @@ public class UIManager : MonoBehaviour
         buttonClick.Play();
     }
 
+    // Personal Info Button
     public void InfoButton()
     {
         infoPanel.SetActive(true);
@@ -32,25 +60,35 @@ public class UIManager : MonoBehaviour
         buttonClick.Play();
     }
 
-    public void recordButton()
-    {
-        recordPanel.SetActive(true);
-        infoPanel.SetActive(false);
-        deckPanel.SetActive(false);
-
-        buttonClick.Play();
-    }
-
+    // Deck Creation Button
     public void deckCreateButton()
     {
         deckCreatePanel.SetActive(true);
+        deckManager.PopulateAnimalButtons();
 
         buttonClick.Play();
     }
 
-    public void confirmButton()
+    // Record Button
+    public void recordButton()
     {
-        deckCreatePanel.SetActive(false);
+        if (cachedBattles != null)
+        {
+            recordManager.DisplayBattleRecords(cachedBattles);
+        }
+        else
+        {
+            gameManager.FetchBattleRecords((battleList) =>
+            {
+                cachedBattles = battleList;
+
+                recordManager.DisplayBattleRecords(battleList);
+            });
+        }
+
+        recordPanel.SetActive(true);
+        infoPanel.SetActive(false);
+        deckPanel.SetActive(false);
 
         buttonClick.Play();
     }
