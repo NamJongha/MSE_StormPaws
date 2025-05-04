@@ -1,11 +1,15 @@
+using JetBrains.Annotations;
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LogInGoogle : MonoBehaviour
 {
     private string clientId = "533627938955-l5b18rcahau188jbu4ta1r6ik2m47o6l.apps.googleusercontent.com";
-    private string redirectUri = "http://localhost:8080/user/login/google";
+    private string redirectUri = "http://localhost:5000/";
 
+    //외부 브라우저를 열고 redirect uri로 code를 전달 -> uri가 유니티 로컬 서버인 경우 유니티로 전달됨
     public void signInWithGoogle()
     {
         string scope = Uri.EscapeDataString("openid email profile");
@@ -16,10 +20,9 @@ public class LogInGoogle : MonoBehaviour
             "&response_type=code" +
             "&scope=" + scope +
             "&redirect_uri=" + encodedRedirectUri +
-            "&access_type=offline";
+            "&access_type=offline" +
+            "&prompt=consent";
 
-        Debug.Log("Opening OAuth URL: " + oauthUrl);
         Application.OpenURL(oauthUrl);
     }
 }
-    
