@@ -13,6 +13,9 @@ public class CodeReceiver : MonoBehaviour
     private const string RedirectUri = "http://localhost:5000/";
     private Queue<string> receivedCodes = new Queue<string>();
 
+    [SerializeField]
+    private GameObject tokenManager;
+
     void Start()
     {
         StartServer();
@@ -78,7 +81,7 @@ public class CodeReceiver : MonoBehaviour
 
     private IEnumerator SendCodeCoroutine(string code)
     {
-        string backendUrl = "http://localhost:8082/user/getToken/google";
+        string backendUrl = "http://localhost:8082/user/login/google";
 
         CodePayload payload = new CodePayload { code = code };
         string json = JsonUtility.ToJson(payload);
@@ -101,40 +104,35 @@ public class CodeReceiver : MonoBehaviour
             string jsonResponse = request.downloadHandler.text;
             ResponseFromServer responseFromServer = JsonUtility.FromJson<ResponseFromServer>(jsonResponse);
 
-            string accessToken = responseFromServer.data.accessToken;
+            string accessToken = responseFromServer.data.accessToken; //DTO클래스는 TokenManager 스크립트에 정의됨
             string refreshToken = responseFromServer.data.refreshToken;
 
             Debug.Log("access: " + accessToken);
             Debug.Log("refresh: " + refreshToken);
+
+            TokenManager.SaveToken(accessToken, refreshToken);
         }
         else
         {
             Debug.LogError("Login failed: " + request.error);
         }
     }
-
-    #region JsonUtilityParameter
-    [Serializable]
-    public class CodePayload
-    {
-        public string code;
-    }
-    #endregion
-
-    #region JsonResponseParameter
-    [Serializable]
-    public class ResponseFromServer
-    {
-        public bool success;
-        public string message;
-        public AuthDataDTO data;
-    }
-
-    [Serializable]
-    public class AuthDataDTO
-    {
-        public string accessToken;
-        public string refreshToken;
-    }
-    #endregion
 }
+
+#region JsonUtilityParameter
+[Serializable]
+public class CodePayload
+{
+    public string code;
+}
+#endregion
+
+#region JsonResponseParameter
+[Serializable]
+public class ResponseFromServer
+{
+    public bool success;
+    public string message;
+    public AuthDataDTO data;
+}
+#endregion
