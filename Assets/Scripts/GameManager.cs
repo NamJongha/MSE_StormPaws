@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.Networking;
 using System.Collections;
+using TMPro;
+using UnityEditor.PackageManager.Requests;
 
 /// <summary>
 /// Entire of My Page Feature And Game Management Class
@@ -19,6 +21,10 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // 테스트용 JWT 강제 저장
+            PlayerPrefs.SetString("jwt", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1M2ZkODNiNy00NTlkLTRmYjQtOTVlMy1lMzViMTEzNDIzYjYiLCJvYXV0aFR5cGUiOiJnb29nbGUiLCJvYXV0aElkIjoiMTA1MzUyMjQ0NTA1NjU2MDAwOTIzIiwiZW1haWwiOiJkYnNyYmFsczI2QGdtYWlsLmNvbSIsImlhdCI6MTc0NjExOTI5NywiZXhwIjoxNzUyMTY3Mjk3fQ.GPg7V9P0ezFrQvpkR-xWnWc8nfXz0RnwBOs-JaHEvXs");
+            PlayerPrefs.Save();
         }
         else
         {
@@ -150,15 +156,37 @@ public class GameManager : MonoBehaviour
     private PersonalInfo cachedInfo = null;
     private List<DeckPreset> cachedDeckPresets = null;
 
+    // Personal Info UI
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI mainText;
+    public TextMeshProUGUI emailText;
+    public TextMeshProUGUI idText;
+
+    private IEnumerator Start()
+    {
+        yield return null; // 한 프레임 기다리기
+
+        FetchPersonalInfo(info =>
+        {
+            nameText.text = info.nickname;
+            idText.text = info.id;
+            mainText.text = info.nickname;
+            emailText.text = info.email;
+        });
+    }
+
+
     // JWT Token Management
     public string GetAuthToken()
     {
         return PlayerPrefs.GetString("jwt");
+        // 테스트용 하드코딩
+        //return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1M2ZkODNiNy00NTlkLTRmYjQtOTVlMy1lMzViMTEzNDIzYjYiLCJvYXV0aFR5cGUiOiJnb29nbGUiLCJvYXV0aElkIjoiMTA1MzUyMjQ0NTA1NjU2MDAwOTIzIiwiZW1haWwiOiJkYnNyYmFsczI2QGdtYWlsLmNvbSIsImlhdCI6MTc0NjExOTI5NywiZXhwIjoxNzUyMTY3Mjk3fQ.GPg7V9P0ezFrQvpkR-xWnWc8nfXz0RnwBOs-JaHEvXs";
     }
 
     // Callback Personal Information
     public void FetchPersonalInfo(Action<PersonalInfo> callback)
-    {
+    { 
         if (cachedInfo != null)
         {
             callback?.Invoke(cachedInfo);
@@ -226,14 +254,19 @@ public class GameManager : MonoBehaviour
         }));
     }
 
-    // Request API
     private IEnumerator GetRequest(string url, Action<string> onSuccess, Action<string> onError = null)
     {
         Debug.Log($"[GET Request] {url}");
 
+        string token = GetAuthToken();
+        Debug.Log($"JWT Token: {token}");
+
         UnityWebRequest request = UnityWebRequest.Get(url);
-        request.SetRequestHeader("Authorization", $"Bearer {GetAuthToken()}");
+        string authHeader = $"Bearer {token.Trim()}";
+        request.SetRequestHeader("Authorization", authHeader);
         request.SetRequestHeader("Content-Type", "application/json");
+
+        Debug.Log($"Authorization Header Set: {authHeader}");
 
         yield return request.SendWebRequest();
 

@@ -8,9 +8,17 @@ public class LogInManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (TokenManager.hasToken)
+        {
+            isLogin = true;
+        }
+
         if (isLogin)
         {
-            SceneManager.LoadScene("NextSceneName");
+            if (!SceneManager.GetSceneByName("HomeScreen").isLoaded)
+            {
+                SceneManager.LoadScene("HomeScreen");
+            }
         }
     }
 }

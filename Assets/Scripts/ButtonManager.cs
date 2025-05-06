@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GameManager;
 
 /// <summary>
@@ -46,6 +47,7 @@ public class ButtonManager : MonoBehaviour
         deckPanel.SetActive(true);
         infoPanel.SetActive(false);
         recordPanel.SetActive(false);
+        deckCreatePanel.SetActive(false);
 
         buttonClick.Play();
     }
@@ -56,6 +58,7 @@ public class ButtonManager : MonoBehaviour
         infoPanel.SetActive(true);
         deckPanel.SetActive(false);
         recordPanel.SetActive(false);
+        deckCreatePanel.SetActive(false);
 
         buttonClick.Play();
     }
@@ -89,7 +92,15 @@ public class ButtonManager : MonoBehaviour
         recordPanel.SetActive(true);
         infoPanel.SetActive(false);
         deckPanel.SetActive(false);
+        deckCreatePanel.SetActive(false);
 
         buttonClick.Play();
+    }
+
+    // Home Button
+    public void homeButton()
+    {
+        buttonClick.Play();
+        SceneManager.LoadScene("HomeScreen");
     }
 }
