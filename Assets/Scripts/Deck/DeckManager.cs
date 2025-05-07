@@ -66,7 +66,7 @@ public class DeckManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Debug.Log("덱 개수: " + decks.Count);
+        Debug.Log("Deck Count: " + decks.Count);
 
         for (int i = 0; i < decks.Count; i++)
         {
@@ -74,17 +74,16 @@ public class DeckManager : MonoBehaviour
 
             // Create Prefab Instance
             GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
-            Debug.Log($"슬롯 생성됨: {slotGO.name}");
 
             // DeckSlotUI script
             DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
 
             if (ui != null)
             {
-                // 슬롯 내용 설정
+                // Slot UI
                 ui.SetDeck(i, deck, gameManager);
 
-                // 삭제 버튼 연결
+                // Delete Button
                 string deckId = deck.id;
                 ui.deleteButton.onClick.RemoveAllListeners();
                 ui.deleteButton.onClick.AddListener(() => DeleteDeck(deckId));
@@ -111,7 +110,7 @@ public class DeckManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Debug.Log("덱 개수: " + decks.Count);
+        Debug.Log("Deck Count: " + decks.Count);
 
         for (int i = 0; i < decks.Count; i++)
         {
@@ -119,7 +118,6 @@ public class DeckManager : MonoBehaviour
 
             // Create Prefab Instance
             GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
-            Debug.Log($"슬롯 생성됨: {slotGO.name}");
 
             // DeckSlotUI script
             DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
@@ -179,17 +177,15 @@ public class DeckManager : MonoBehaviour
     {
         if (allCards == null)
         {
-            Debug.LogError("allCards 자체가 null입니다. InitCardList() 안 불렸거나, 서버 응답 실패");
+            Debug.LogError("allCards is null");
             return;
         }
 
         if (allCards.Count == 0)
         {
-            Debug.LogWarning("allCards.Count == 0. 서버에 카드가 없거나 파싱에 실패했습니다");
+            Debug.LogWarning("allCards.Count == 0. Fail Parsing");
             return;
         }
-
-        Debug.Log($"카드 수: {allCards.Count}개");
 
         foreach (Card card in allCards)
         {
@@ -213,10 +209,6 @@ public class DeckManager : MonoBehaviour
             {
                 label.text = card.name;
             }
-            else
-            {
-                Debug.LogWarning("Label (AnimalName) not found in prefab");
-            }
 
             // Image
             Image img = btn.transform.Find("AnimalImage")?.GetComponent<Image>();
@@ -228,10 +220,6 @@ public class DeckManager : MonoBehaviour
                     Debug.LogWarning($"Sprite not found for card: {card.name}");
                 }
                 img.sprite = sprite;
-            }
-            else
-            {
-                Debug.LogWarning("Image (AnimalImage) not found in prefab");
             }
 
             // Click
@@ -245,8 +233,6 @@ public class DeckManager : MonoBehaviour
             {
                 Debug.LogWarning("Button component not found on animalButtonPrefab");
             }
-
-            Debug.Log($"[버튼 생성] card.name: '{card.name}'");
 
             // Tool tip
             AnimalHoverTooltip hover = btn.GetComponent<AnimalHoverTooltip>();

@@ -228,8 +228,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.069994, y: -2.3703308}
-  m_SizeDelta: {x: 18.64464, y: 23.54048}
+  m_AnchoredPosition: {x: 0.3563, y: -3.3402252}
+  m_SizeDelta: {x: 19.4972, y: 20.760435}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &450714969
 MonoBehaviour:
@@ -400,7 +400,7 @@ RectTransform:
   m_GameObject: {fileID: 791686564}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.05, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1601694449}
@@ -408,7 +408,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -4, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &791686566
 MonoBehaviour:
@@ -437,19 +437,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 147
     m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 418
+    m_Bottom: 693
   m_ChildAlignment: 0
-  m_Spacing: 0
+  m_Spacing: -50.17
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 0
+  m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_ReverseArrangement: 1
 --- !u!1 &912721230
 GameObject:
   m_ObjectHideFlags: 0
@@ -820,7 +820,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1141045759
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1432,8 +1432,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 140.64127, y: 0}
-  m_SizeDelta: {x: -289, y: 11.071899}
+  m_AnchoredPosition: {x: 140.64127, y: -1.2600021}
+  m_SizeDelta: {x: -289, y: 20.620003}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1748616961
 MonoBehaviour:
@@ -1478,8 +1478,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 450714969}
   m_HandleRect: {fileID: 450714968}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.1473817
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1677,8 +1677,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8ae1a337a69cc24a8a5ad73cc6e730a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deckSlotPrefab: {fileID: 4096738450211299062, guid: 2b67c40e5c2b99d478d1254fda3cb38d, type: 3}
+  deckSlotPrefab: {fileID: 6319981907478861027, guid: 7cffb4debc3b8bc43b13754157ccef6b, type: 3}
   slotParent: {fileID: 791686565}
+  gameManager: {fileID: 1870811977}
 --- !u!82 &1870811974
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1788,10 +1789,10 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 546d7c8b074cb354b99a4df4bdfe270f, type: 3}
   m_Resource: {fileID: 8300000, guid: 546d7c8b074cb354b99a4df4bdfe270f, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

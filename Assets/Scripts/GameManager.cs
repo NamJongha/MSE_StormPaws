@@ -8,26 +8,11 @@ using UnityEditor.PackageManager.Requests;
 
 /// <summary>
 /// Entire of My Page Feature And Game Management Class
+/// I will restruct later
 /// </summary>
 
 public class GameManager : MonoBehaviour
 {
-    // Singletone Instance
-    public static GameManager Instance;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     // API Basic URL
     public string baseUrl = "http://localhost:8080";
 
@@ -101,6 +86,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     [System.Serializable]
     public class SelectedOpponentResponse
     {
@@ -147,6 +133,26 @@ public class GameManager : MonoBehaviour
         public bool success;
         public string message;
         public DeckPreset data;
+    }
+
+    [System.Serializable]
+    public class OpponentDeckListResponse
+    {
+        public bool success;
+        public string message;
+        public OpponentDeckListData data;
+    }
+
+    [System.Serializable]
+    public class OpponentDeckListData
+    {
+        public List<OpponentDeck> items;
+        public int totalItems;
+        public int totalPages;
+        public int currentPage;
+        public int pageSize;
+        public bool hasPrevious;
+        public bool hasNext;
     }
 
     // JSON Parsing
@@ -230,14 +236,19 @@ public class GameManager : MonoBehaviour
         return opponentDeckList;
     }
 
-    public void SetSelectedOpponentDeckId(string deckId)
+    public void FetchDeckById(string deckId, Action<DeckPreset> callback)
     {
-        selectedOpponentDeckId = deckId;
-    }
-
-    public string GetSelectedOpponentDeckId()
-    {
-        return selectedOpponentDeckId;
+        string url = $"{baseUrl}/decks/{deckId}";
+        StartCoroutine(GetRequest(url, (json) =>
+        {
+            var response = JsonUtility.FromJson<SelectedMyDeckResponse>(json);
+            callback?.Invoke(response.data);
+        },
+        (error) =>
+        {
+            Debug.LogError("Fail: " + error);
+            callback?.Invoke(null);
+        }));
     }
 
     public void FetchAllCards(Action<List<Card>> callback)

@@ -31,8 +31,7 @@ public class BattleUnitSpawner : MonoBehaviour
 
     void Awake()
     {
-        if (gameManager == null)
-            gameManager = GameManager.Instance;
+
     }
 
     void Start()

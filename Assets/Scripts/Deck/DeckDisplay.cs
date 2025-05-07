@@ -23,7 +23,7 @@ public class DeckDisplay : MonoBehaviour
                 if (prefab != null)
                 {
                     Vector3 spawnPos = spawnPoints[i].position + new Vector3(0, 0.5f, 0);
-                    Quaternion rotation = Quaternion.Euler(0, 180f, 0); // Y축 회전
+                    Quaternion rotation = Quaternion.Euler(0, 180f, 0);
                     Instantiate(prefab, spawnPos, rotation, spawnPoints[i]);
                 }
                 else
@@ -45,7 +45,6 @@ public class DeckDisplay : MonoBehaviour
         }
     }
 
-    // Sprite Loading
     private Dictionary<string, string> spriteNameMap = new Dictionary<string, string>
     {
         { "개구리", "Frog" },

@@ -1,21 +1,37 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-// BGM 관리 스크립트
 public class BGMManager : MonoBehaviour
 {
-    public AudioSource bgm;
+    private static BGMManager instance;
+    private AudioSource bgm;
 
     void Awake()
     {
-        bgm = GetComponent<AudioSource>();
-
-        if (bgm != null)
+        if (instance == null)
         {
-            DontDestroyOnLoad(bgm);
+            instance = this;
+            bgm = GetComponent<AudioSource>();
+            DontDestroyOnLoad(gameObject);
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
-            Destroy(bgm);
+            Destroy(gameObject);
+        }
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MyDeckSelect") 
+        {
+            Destroy(gameObject);
         }
     }
 }

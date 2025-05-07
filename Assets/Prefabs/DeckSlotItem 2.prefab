@@ -833,6 +833,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9e55308541e4ce4b8d691cbd1a54e99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deckDisplay: {fileID: 0}
   deckIdText: {fileID: 7044888998482634600}
   animalImages:
   - {fileID: 1743140437608538197}

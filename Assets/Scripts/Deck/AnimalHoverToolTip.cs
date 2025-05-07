@@ -34,7 +34,6 @@ public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerE
         if (card == null)
         {
             tooltipText.text = "No Info";
-            Debug.LogWarning("툴팁 카드 없음");
             return;
         }
 

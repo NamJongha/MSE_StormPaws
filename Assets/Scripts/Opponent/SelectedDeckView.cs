@@ -1,9 +1,13 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class SelectedDeckView : MonoBehaviour
 {
+    public GameManager gameManager;
+
     [System.Serializable]
     public class AnimalSlot
     {
@@ -15,28 +19,42 @@ public class SelectedDeckView : MonoBehaviour
 
     void Start()
     {
-        string deckId = GameManager.Instance.GetSelectedOpponentDeckId();
-        var deck = GameManager.Instance.GetOpponentDeckList().Find(d => d.id == deckId);
-
-        if (deck == null)
+        string deckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+        if (string.IsNullOrEmpty(deckId))
         {
-            Debug.LogError("선택된 덱을 찾을 수 없습니다.");
             return;
         }
 
-        for (int i = 0; i < animalSlots.Length; i++)
+        StartCoroutine(FetchDeckById(deckId));
+    }
+
+    IEnumerator FetchDeckById(string deckId)
+    {
+        string url = $"{gameManager.baseUrl}/decks/{deckId}";
+        UnityWebRequest req = UnityWebRequest.Get(url);
+        req.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
+
+        yield return req.SendWebRequest();
+
+        if (req.result == UnityWebRequest.Result.Success)
         {
-            if (i < deck.decklist.Count)
+            var response = JsonUtility.FromJson<GameManager.SelectedOpponentResponse>(req.downloadHandler.text);
+            var deck = response.data;
+
+            for (int i = 0; i < animalSlots.Length; i++)
             {
-                var card = deck.decklist[i].card;
-                animalSlots[i].icon.sprite = GameManager.Instance.LoadAnimalSprite(card.name);
-                animalSlots[i].icon.color = Color.white;
-                animalSlots[i].nameText.text = card.name;
-            }
-            else
-            {
-                animalSlots[i].icon.gameObject.SetActive(false);
-                animalSlots[i].nameText.text = "";
+                if (i < deck.decklist.Count)
+                {
+                    var card = deck.decklist[i].card;
+                    animalSlots[i].icon.sprite = gameManager.LoadAnimalSprite(card.name);
+                    animalSlots[i].icon.color = Color.white;
+                    animalSlots[i].nameText.text = card.name;
+                }
+                else
+                {
+                    animalSlots[i].icon.gameObject.SetActive(false);
+                    animalSlots[i].nameText.text = "";
+                }
             }
         }
     }

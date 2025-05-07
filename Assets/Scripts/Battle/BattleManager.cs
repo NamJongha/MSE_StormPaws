@@ -17,8 +17,7 @@ public class BattleManager : MonoBehaviour
 
     void Awake()
     {
-        if (gameManager == null)
-            gameManager = GameManager.Instance;
+
     }
 
     void Start()
