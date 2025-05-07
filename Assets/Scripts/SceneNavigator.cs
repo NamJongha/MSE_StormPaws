@@ -18,4 +18,9 @@ public class SceneNavigator : MonoBehaviour
         SceneManager.LoadScene("Opponent");
         Debug.Log("배틀 씬으로 이동 시도..."); // 확인용 로그
     }
+
+    public void GoToMyDeckScene()
+    {
+        SceneManager.LoadScene("MyDeckSelect");
+    }
 }

@@ -783,7 +783,7 @@ GameObject:
   - component: {fileID: 6995142848782714313}
   - component: {fileID: 159759192092252797}
   - component: {fileID: 8846924043417216151}
-  - component: {fileID: 8129576324503034455}
+  - component: {fileID: 8321420137614394592}
   m_Layer: 5
   m_Name: OpponentList
   m_TagString: Untagged
@@ -852,7 +852,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8129576324503034455
+--- !u!114 &8321420137614394592
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -864,21 +864,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7af1d007e072dbc42b0583fc518ef4ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ui:
-    indexText: {fileID: 6584164419956097410}
-    ownerNameText: {fileID: 8083702672048016443}
-    animalSlots:
-    - icon: {fileID: 7417010412323749927}
-      nameText: {fileID: 635827439429636155}
-    - icon: {fileID: 6985357821649592651}
-      nameText: {fileID: 5086144440770368897}
-    - icon: {fileID: 8740503376282533461}
-      nameText: {fileID: 9014785952538401096}
-    - icon: {fileID: 8240203245545136549}
-      nameText: {fileID: 8869714989386558329}
-    - icon: {fileID: 942934667983150226}
-      nameText: {fileID: 296463588922270357}
-    selectButton: {fileID: 800224744600528571}
+  ownerNameText: {fileID: 8083702672048016443}
+  animalImages:
+  - {fileID: 7417010412323749927}
+  - {fileID: 6985357821649592651}
+  - {fileID: 8740503376282533461}
+  - {fileID: 8240203245545136549}
+  - {fileID: 942934667983150226}
+  selectButton: {fileID: 800224744600528571}
 --- !u!1 &4783350813370259548
 GameObject:
   m_ObjectHideFlags: 0

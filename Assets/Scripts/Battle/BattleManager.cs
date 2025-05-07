@@ -10,10 +10,16 @@ using TMPro;
 public class BattleManager : MonoBehaviour
 {
     public Transform backgroundContainer;
-    public GameManager gameManager;
+    private GameManager gameManager;
 
     public TMP_Text weatherText;
     public TMP_Text cityText;
+
+    void Awake()
+    {
+        if (gameManager == null)
+            gameManager = GameManager.Instance;
+    }
 
     void Start()
     {

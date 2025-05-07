@@ -5,7 +5,7 @@ using static GameManager;
 
 public class BattleUnitSpawner : MonoBehaviour
 {
-    public GameManager gameManager;
+    private GameManager gameManager;
 
     public Transform[] mySpawnPoints;
     public Transform[] opponentSpawnPoints;
@@ -28,6 +28,12 @@ public class BattleUnitSpawner : MonoBehaviour
         { "하마", "hippo" },
         { "기린", "giraffe" }
     };
+
+    void Awake()
+    {
+        if (gameManager == null)
+            gameManager = GameManager.Instance;
+    }
 
     void Start()
     {
@@ -55,23 +61,23 @@ public class BattleUnitSpawner : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        gameManager.FetchSelectedOpponentDeck(opponentDeck =>
-        {
-            for (int i = 0; i < opponentDeck.decklist.Count && i < opponentSpawnPoints.Length; i++)
-            {
-                string modelName = GetModelName(opponentDeck.decklist[i].card.name);
-                GameObject prefab = LoadAnimalPrefab(modelName);
-                if (prefab != null)
-                {
-                    Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
-                    Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
-                }
-                else
-                {
-                    Debug.LogWarning("No Prefab: " + modelName);
-                }
-            }
-        });
+        //gameManager.FetchSelectedOpponentDeck(opponentDeck =>
+        //{
+        //    for (int i = 0; i < opponentDeck.decklist.Count && i < opponentSpawnPoints.Length; i++)
+        //    {
+        //        string modelName = GetModelName(opponentDeck.decklist[i].card.name);
+        //        GameObject prefab = LoadAnimalPrefab(modelName);
+        //        if (prefab != null)
+        //        {
+        //            Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
+        //            Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
+        //        }
+        //        else
+        //        {
+        //            Debug.LogWarning("No Prefab: " + modelName);
+        //        }
+        //    }
+        //});
     }
 
     private string GetModelName(string cardName)

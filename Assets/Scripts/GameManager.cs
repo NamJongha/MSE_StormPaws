@@ -21,10 +21,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            // 테스트용 JWT 강제 저장
-            PlayerPrefs.SetString("jwt", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1M2ZkODNiNy00NTlkLTRmYjQtOTVlMy1lMzViMTEzNDIzYjYiLCJvYXV0aFR5cGUiOiJnb29nbGUiLCJvYXV0aElkIjoiMTA1MzUyMjQ0NTA1NjU2MDAwOTIzIiwiZW1haWwiOiJkYnNyYmFsczI2QGdtYWlsLmNvbSIsImlhdCI6MTc0NjExOTI5NywiZXhwIjoxNzUyMTY3Mjk3fQ.GPg7V9P0ezFrQvpkR-xWnWc8nfXz0RnwBOs-JaHEvXs");
-            PlayerPrefs.Save();
         }
         else
         {
@@ -41,22 +37,10 @@ public class GameManager : MonoBehaviour
     {
         public string id;
         public string email;
-        public string nickname;
+        public string name;
     }
 
     // Card Data
-    [System.Serializable]
-    public class Card
-    {
-        public string id;
-        public string name;
-        public int attackPower;
-        public int attackSpeed;
-        public int health;
-        public string cardType;
-        public int additionalCoefficient;
-    }
-
     [System.Serializable]
     public class DeckCard
     {
@@ -70,7 +54,7 @@ public class GameManager : MonoBehaviour
     public class DeckPreset
     {
         public string id;
-        public string name;
+        public string deckName;
         public List<DeckCard> decklist;
     }
 
@@ -102,9 +86,19 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class OpponentDeck
     {
-        public string ownerName;
         public string id;
+        public string name;
+        public User user;
         public List<DeckCard> decklist;
+
+        public string ownerName => user != null ? user.name : "Unknown";
+
+        [System.Serializable]
+        public class User
+        {
+            public string id;
+            public string name;
+        }
     }
 
     [System.Serializable]
@@ -116,17 +110,35 @@ public class GameManager : MonoBehaviour
     }
 
     [System.Serializable]
-    public class CardListResponse
+    public class Card
     {
-        public bool success;
-        public string message;
-        public CardListData data;
+        public string id;
+        public string name;
+        public int attackPower;
+        public int attackSpeed;
+        public int health;
+        public string cardType;
+        public float additionalCoefficient;
     }
 
     [System.Serializable]
     public class CardListData
     {
         public List<Card> items;
+        public int totalItems;
+        public int pageSize;
+        public int currentPage;
+        public int totalPages;
+        public bool hasPrevious;
+        public bool hasNext;
+    }
+
+    [System.Serializable]
+    public class CardListResponse
+    {
+        public bool success;
+        public string message;
+        public CardListData data;
     }
 
     [System.Serializable]
@@ -156,32 +168,13 @@ public class GameManager : MonoBehaviour
     private PersonalInfo cachedInfo = null;
     private List<DeckPreset> cachedDeckPresets = null;
 
-    // Personal Info UI
-    public TextMeshProUGUI nameText;
-    public TextMeshProUGUI mainText;
-    public TextMeshProUGUI emailText;
-    public TextMeshProUGUI idText;
-
-    private IEnumerator Start()
-    {
-        yield return null; // 한 프레임 기다리기
-
-        FetchPersonalInfo(info =>
-        {
-            nameText.text = info.nickname;
-            idText.text = info.id;
-            mainText.text = info.nickname;
-            emailText.text = info.email;
-        });
-    }
-
+    public List<OpponentDeck> opponentDeckList = new List<OpponentDeck>();
+    private string selectedOpponentDeckId;
 
     // JWT Token Management
     public string GetAuthToken()
     {
-        return PlayerPrefs.GetString("jwt");
-        // 테스트용 하드코딩
-        //return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1M2ZkODNiNy00NTlkLTRmYjQtOTVlMy1lMzViMTEzNDIzYjYiLCJvYXV0aFR5cGUiOiJnb29nbGUiLCJvYXV0aElkIjoiMTA1MzUyMjQ0NTA1NjU2MDAwOTIzIiwiZW1haWwiOiJkYnNyYmFsczI2QGdtYWlsLmNvbSIsImlhdCI6MTc0NjExOTI5NywiZXhwIjoxNzUyMTY3Mjk3fQ.GPg7V9P0ezFrQvpkR-xWnWc8nfXz0RnwBOs-JaHEvXs";
+        return PlayerPrefs.GetString("accessToken");
     }
 
     // Callback Personal Information
@@ -227,13 +220,24 @@ public class GameManager : MonoBehaviour
         }));
     }
 
-    public void FetchSelectedOpponentDeck(Action<OpponentDeck> callback)
+    public void SetOpponentDeckList(List<OpponentDeck> list)
     {
-        StartCoroutine(GetRequest($"{baseUrl}/battle/selected-opponent", (json) =>
-        {
-            SelectedOpponentResponse wrapper = JsonUtility.FromJson<SelectedOpponentResponse>(json);
-            callback?.Invoke(wrapper.data);
-        }));
+        opponentDeckList = list;
+    }
+
+    public List<OpponentDeck> GetOpponentDeckList()
+    {
+        return opponentDeckList;
+    }
+
+    public void SetSelectedOpponentDeckId(string deckId)
+    {
+        selectedOpponentDeckId = deckId;
+    }
+
+    public string GetSelectedOpponentDeckId()
+    {
+        return selectedOpponentDeckId;
     }
 
     public void FetchAllCards(Action<List<Card>> callback)
@@ -242,6 +246,10 @@ public class GameManager : MonoBehaviour
         {
             CardListResponse wrapper = JsonUtility.FromJson<CardListResponse>(json);
             callback?.Invoke(wrapper.data.items);
+        },
+        (error) =>
+        {
+            callback?.Invoke(null);
         }));
     }
 
@@ -266,7 +274,6 @@ public class GameManager : MonoBehaviour
         request.SetRequestHeader("Authorization", authHeader);
         request.SetRequestHeader("Content-Type", "application/json");
 
-        Debug.Log($"Authorization Header Set: {authHeader}");
 
         yield return request.SendWebRequest();
 
@@ -276,7 +283,6 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"API Error: {request.error}");
             onError?.Invoke(request.error);
         }
     }
@@ -284,25 +290,26 @@ public class GameManager : MonoBehaviour
     // Sprite Loading
     private Dictionary<string, string> spriteNameMap = new Dictionary<string, string>
     {
-        { "개구리", "frog" },
-        { "타조", "ostrich" },
-        { "아프리카 코끼리", "elephant" },
-        { "햄스터", "hamster" },
-        { "목도리 도마뱀", "geko" },
-        { "사자", "lion" },
-        { "흰수염고래", "whale" },
-        { "원숭이", "monkey" },
-        { "말", "horse" },
-        { "호랑이", "tiger" },
-        { "북극곰", "polarbear" },
-        { "문어", "octopus" },
-        { "나무늘보", "sloth" },
-        { "하마", "hippo" },
-        { "기린", "giraffe" }
+        { "개구리", "Frog" },
+        { "타조", "Ostrich" },
+        { "아프리카 코끼리", "Elephant" },
+        { "햄스터", "Hamster" },
+        { "목도리 도마뱀", "Geko" },
+        { "사자", "Lion" },
+        { "흰수염고래", "Whale" },
+        { "원숭이", "Monkey" },
+        { "말", "Horse" },
+        { "호랑이", "Tiger" },
+        { "북극곰", "Polarbear" },
+        { "문어", "Octopus" },
+        { "나무늘보", "Sloth" },
+        { "하마", "Hippo" },
+        { "기린", "Giraffe" }
     };
 
     public Sprite LoadAnimalSprite(string cardName)
     {
+
         if (spriteNameMap.TryGetValue(cardName, out string spriteName))
         {
             return Resources.Load<Sprite>($"Animals/{spriteName}");
@@ -310,7 +317,5 @@ public class GameManager : MonoBehaviour
 
         Debug.LogWarning($"Cannot Find Sprite: {cardName}");
         return null;
-
-        //return Resources.Load<Sprite>("Animals/default");
     }
 }

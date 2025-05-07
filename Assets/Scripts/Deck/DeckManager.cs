@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using static GameManager;
+using static UnityEngine.Rendering.GPUSort;
 
 /// <summary>
 /// Deck Creation & Delete Manager Script
@@ -57,11 +58,6 @@ public class DeckManager : MonoBehaviour
 
     private List<Card> allCards;
     private List<Card> selectedCards = new List<Card>();
-    private List<DeckPreset> cachedDecks;
-
-    // Mouse hover tool tip
-    private GameObject tooltipPanel;
-    private TMP_Text tooltipText;
 
     public void DisplayDeckList(List<DeckPreset> decks)
     {
@@ -70,12 +66,15 @@ public class DeckManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        Debug.Log("덱 개수: " + decks.Count);
+
         for (int i = 0; i < decks.Count; i++)
         {
             var deck = decks[i];
 
             // Create Prefab Instance
             GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
+            Debug.Log($"슬롯 생성됨: {slotGO.name}");
 
             // DeckSlotUI script
             DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
@@ -83,7 +82,7 @@ public class DeckManager : MonoBehaviour
             if (ui != null)
             {
                 // 슬롯 내용 설정
-                ui.SetDeck(i + 1, deck, gameManager);
+                ui.SetDeck(i, deck, gameManager);
 
                 // 삭제 버튼 연결
                 string deckId = deck.id;
@@ -103,6 +102,44 @@ public class DeckManager : MonoBehaviour
         }
 
         createDeckButton.SetActive(true);
+    }
+
+    public void MyDeckSelect(List<DeckPreset> decks)
+    {
+        foreach (Transform child in deckSlotContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        Debug.Log("덱 개수: " + decks.Count);
+
+        for (int i = 0; i < decks.Count; i++)
+        {
+            var deck = decks[i];
+
+            // Create Prefab Instance
+            GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
+            Debug.Log($"슬롯 생성됨: {slotGO.name}");
+
+            // DeckSlotUI script
+            DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
+
+            if (ui != null)
+            {
+                // 슬롯 내용 설정
+                ui.SetDeck(i, deck, gameManager);
+
+                if (deckDisplay != null)
+                {
+                    ui.selectButton.onClick.RemoveAllListeners();
+                    ui.selectButton.onClick.AddListener(() => deckDisplay.DisplayDeck(deck.decklist));
+                }
+            }
+            else
+            {
+                Debug.LogError("No DeckSlotUI Component");
+            }
+        }
     }
 
 
@@ -140,27 +177,61 @@ public class DeckManager : MonoBehaviour
 
     public void PopulateAnimalButtons()
     {
-        foreach (Transform child in animalButtonContainer)
+        if (allCards == null)
         {
-            Destroy(child.gameObject); // Initialize
+            Debug.LogError("allCards 자체가 null입니다. InitCardList() 안 불렸거나, 서버 응답 실패");
+            return;
         }
+
+        if (allCards.Count == 0)
+        {
+            Debug.LogWarning("allCards.Count == 0. 서버에 카드가 없거나 파싱에 실패했습니다");
+            return;
+        }
+
+        Debug.Log($"카드 수: {allCards.Count}개");
 
         foreach (Card card in allCards)
         {
+            if (card == null)
+            {
+                Debug.LogWarning("Card is null");
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(card.name))
+            {
+                Debug.LogWarning("Card name is null or empty");
+                continue;
+            }
+
             GameObject btn = Instantiate(animalButtonPrefab, animalButtonContainer);
 
             // Text
-            TMP_Text label = btn.transform.Find("AnimalName").GetComponent<TMP_Text>();
+            TMP_Text label = btn.transform.Find("AnimalName")?.GetComponent<TMP_Text>();
             if (label != null)
             {
                 label.text = card.name;
             }
+            else
+            {
+                Debug.LogWarning("Label (AnimalName) not found in prefab");
+            }
 
             // Image
-            Image img = btn.transform.Find("AnimalImage").GetComponent<Image>();
+            Image img = btn.transform.Find("AnimalImage")?.GetComponent<Image>();
             if (img != null)
             {
-                img.sprite = gameManager.LoadAnimalSprite(card.name);
+                Sprite sprite = gameManager.LoadAnimalSprite(card.name);
+                if (sprite == null)
+                {
+                    Debug.LogWarning($"Sprite not found for card: {card.name}");
+                }
+                img.sprite = sprite;
+            }
+            else
+            {
+                Debug.LogWarning("Image (AnimalImage) not found in prefab");
             }
 
             // Click
@@ -170,14 +241,20 @@ public class DeckManager : MonoBehaviour
                 string animalId = card.name;
                 button.onClick.AddListener(() => OnAnimalClicked(animalId));
             }
+            else
+            {
+                Debug.LogWarning("Button component not found on animalButtonPrefab");
+            }
+
+            Debug.Log($"[버튼 생성] card.name: '{card.name}'");
 
             // Tool tip
-            AnimalHoverTooltip hover = btn.AddComponent<AnimalHoverTooltip>();
-            hover.animalName = card.name;
-            hover.tooltipPanel = tooltipPanel;
-            hover.tooltipText = tooltipText;
-            hover.allCards = allCards;
+            AnimalHoverTooltip hover = btn.GetComponent<AnimalHoverTooltip>();
+            if (hover == null) hover = btn.AddComponent<AnimalHoverTooltip>();
+
+            hover.SetCard(card);
         }
+
     }
 
     // Selecting Animal for Deck Creation

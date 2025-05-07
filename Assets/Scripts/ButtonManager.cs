@@ -67,7 +67,8 @@ public class ButtonManager : MonoBehaviour
     public void deckCreateButton()
     {
         deckCreatePanel.SetActive(true);
-        deckManager.PopulateAnimalButtons();
+        recordPanel.SetActive(false);
+        deckManager.InitCardList();
 
         buttonClick.Play();
     }

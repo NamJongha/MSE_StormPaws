@@ -17,22 +17,24 @@ public class DeckSlotUI : MonoBehaviour
 
     public void SetDeck(int index, DeckPreset deck, GameManager gameManager)
     {
-        deckIdText.text = (index + 1).ToString();
+        deckIdText.text = (index).ToString();
 
         for (int i = 0; i < animalImages.Length; i++)
         {
             if (i < deck.decklist.Count)
             {
-                var card = deck.decklist[i].card;
-                animalNames[i].text = card.name;
-                animalImages[i].sprite = gameManager.LoadAnimalSprite(card.name);
+                var cardData = deck.decklist[i].card;
+                if (cardData == null)
+                {
+                    continue;
+                }
+
+                var sprite = gameManager.LoadAnimalSprite(cardData.name);
+
+                animalNames[i].text = cardData.name;
+                animalImages[i].sprite = sprite;
                 animalImages[i].color = Color.white;
                 animalImages[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                animalNames[i].text = "";
-                animalImages[i].gameObject.SetActive(false);
             }
         }
     }
