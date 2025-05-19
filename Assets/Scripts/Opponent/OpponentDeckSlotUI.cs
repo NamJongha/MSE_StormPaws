@@ -46,6 +46,13 @@ public class OpponentDeckSlotUI : MonoBehaviour
         selectButton.onClick.RemoveAllListeners();
         selectButton.onClick.AddListener(() =>
         {
+            // GameManager에 선택한 적 덱 저장
+            gameManager.SetSelectedOpponentDeck(selectedDeck);
+
+            // PlayerPrefs에 덱 ID 저장
+            PlayerPrefs.SetString("SelectedOpponentDeckId", selectedDeck.id);
+            PlayerPrefs.Save();
+
             SceneManager.LoadScene("MyDeckSelect");
         });
     }

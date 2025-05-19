@@ -217,6 +217,31 @@ public class GameManager : MonoBehaviour
         }));
     }
 
+    public void FetchSelectedOpponentDeck(Action<OpponentDeck> callback)
+    {
+        string deckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+        FetchDeckById(deckId, deck => callback?.Invoke(ConvertToOpponentDeck(deck)));
+    }
+
+    private OpponentDeck ConvertToOpponentDeck(DeckPreset preset)
+    {
+        return new OpponentDeck
+        {
+            id = preset.id,
+            name = preset.deckName,
+            user = new OpponentDeck.User { id = "unknown", name = "AI" },
+            decklist = preset.decklist
+        };
+    }
+
+    public void SetSelectedOpponentDeck(OpponentDeck deck)
+    {
+        selectedOpponentDeckId = deck.id;
+
+        PlayerPrefs.SetString("SelectedOpponentDeckId", deck.id);
+        PlayerPrefs.Save();
+    }
+
     public void FetchBattleRecords(Action<List<BattleRecord>> callback)
     {
         StartCoroutine(GetRequest($"{baseUrl}/battle/logs", (json) =>

@@ -3,10 +3,6 @@ using UnityEngine.Networking;
 using System.Collections;
 using TMPro;
 
-/// <summary>
-/// Battle Scene Manager Script
-/// </summary>
-
 public class BattleManager : MonoBehaviour
 {
     public Transform backgroundContainer;
@@ -17,7 +13,11 @@ public class BattleManager : MonoBehaviour
 
     void Awake()
     {
-
+        gameManager = FindFirstObjectByType<GameManager>();
+        if (gameManager == null)
+        {
+            Debug.LogError("GameManager not found in scene!");
+        }
     }
 
     void Start()
@@ -39,10 +39,10 @@ public class BattleManager : MonoBehaviour
             string weather = response.data.weather.ToLower();
             string city = response.data.city;
 
-            weatherText.text = GetWeatherKorean(weather);
+            weatherText.text = weather;
             cityText.text = city;
 
-            string prefabPath = $"Backgrounds/{weather}_{city}";
+            string prefabPath = $"Backgrounds/{weather}";
             GameObject prefab = Resources.Load<GameObject>(prefabPath);
 
             if (prefab != null)
@@ -51,24 +51,16 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("No Prefab: " + prefabPath);
+                Debug.LogWarning("Missing background prefab: " + prefabPath);
+
+                GameObject fallback = Resources.Load<GameObject>("Backgrounds/default");
+                if (fallback != null)
+                    Instantiate(fallback, backgroundContainer);
             }
         }
         else
         {
             Debug.LogError("Fail: " + request.error);
-        }
-    }
-
-    private string GetWeatherKorean(string weather)
-    {
-        switch (weather.ToLower())
-        {
-            case "rain": return "ºñ";
-            case "sun": return "¸¼À½";
-            case "snow": return "´«";
-            case "cloud": return "Èå¸²";
-            default: return weather;
         }
     }
 }

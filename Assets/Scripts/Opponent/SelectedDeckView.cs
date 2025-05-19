@@ -20,6 +20,7 @@ public class SelectedDeckView : MonoBehaviour
     void Start()
     {
         string deckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+
         if (string.IsNullOrEmpty(deckId))
         {
             return;
