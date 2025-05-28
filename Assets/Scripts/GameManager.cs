@@ -174,8 +174,10 @@ public class GameManager : MonoBehaviour
     private PersonalInfo cachedInfo = null;
     private List<DeckPreset> cachedDeckPresets = null;
 
-    public List<OpponentDeck> opponentDeckList = new List<OpponentDeck>();
+    private List<OpponentDeck> opponentDeckList = new List<OpponentDeck>();
     private string selectedOpponentDeckId;
+
+    private string selectedMyDeckId;
 
     // JWT Token Management
     public string GetAuthToken()
@@ -224,6 +226,23 @@ public class GameManager : MonoBehaviour
             BattleRecordListWrapper wrapper = JsonUtility.FromJson<BattleRecordListWrapper>(json);
             callback?.Invoke(wrapper.data);
         }));
+    }
+
+    //njh save selected my deck id to use it on battle
+    public void SetSelectedMyDeck(DeckPreset myDeck)
+    {
+        selectedMyDeckId = myDeck.id;
+
+        PlayerPrefs.SetString("SelectedMyDeckId", selectedMyDeckId);
+        PlayerPrefs.Save();
+    }
+
+    public void SetSelectedOpponentDeck(OpponentDeck deck)
+    {
+        selectedOpponentDeckId = deck.id;
+
+        PlayerPrefs.SetString("SelectedOpponentDeckId", selectedOpponentDeckId);
+        PlayerPrefs.Save();
     }
 
     public void SetOpponentDeckList(List<OpponentDeck> list)
@@ -282,7 +301,8 @@ public class GameManager : MonoBehaviour
 
         UnityWebRequest request = UnityWebRequest.Get(url);
         string authHeader = $"Bearer {token.Trim()}";
-        request.SetRequestHeader("Authorization", authHeader);
+        //request.SetRequestHeader("Authorization", authHeader);
+        TokenManager.SendServerToken(request);
         request.SetRequestHeader("Content-Type", "application/json");
 
 

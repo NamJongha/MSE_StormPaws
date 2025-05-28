@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
-using Unity.Android.Gradle;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
+//njh
 public class TokenManager : MonoBehaviour
 {
     public static TokenManager Instance { get; private set; }
@@ -43,10 +44,10 @@ public class TokenManager : MonoBehaviour
         return accessToken;
     }
 
-    //서버에 요청을 보낼 때 헤더에 토큰을 넣어주는 함수
-    /* 사용방법
-     * 서버에 Api 요청을 할 때 UnityWebRequest request = UnityWebRequest.Get(URL) 이런 형식으로 request 선언문을 작성하게 됨
-     * 이 선언문 다음 아래 함수를 호출하면서 매개변수로 이 request를 넣어서 사용하면 됩니다.
+    //Function to put access token in the header of the request
+    /* How to use
+     * When declaring API call, it always defined in type of 'UnityWebRequest request = UnityWebRequest.Get(URL)'
+     * You can use this function with giving the defined UnityWebRequest as parameter to put access token in header
     */
     public static void SendServerToken(UnityWebRequest request)
     {
@@ -60,12 +61,13 @@ public class TokenManager : MonoBehaviour
         }
     }
 
-    //accessToken의 만료 검사
+    //check expired state of access token
     public static bool isAccessTokenExpired(string accessToken)
     {
-        string[] parts = accessToken.Split('.'); //jwt토큰은 .을 기반으로 header.payload.signature 로 나누어짐
+        string[] parts = accessToken.Split('.'); //jwt token is devided by '.' into 3 different information - header, payload, signature
         if (parts.Length < 2)
         {
+            hasToken = false;
             return true;
         }
 
@@ -73,11 +75,15 @@ public class TokenManager : MonoBehaviour
         JwtPayload payload = JsonUtility.FromJson<JwtPayload>(payloadJson);
 
         long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        return currentUnixTime >= payload.exp;
+        if(currentUnixTime >= payload.exp)
+        {
+            hasToken = false;
+        }
+        return currentUnixTime >= payload.exp; //true if the token is expired
 
     }
 
-    //refresh token을 백엔드 서버로 넘기며 access token을 새로 발급받음
+    //Send refresh token to backend spring server, and get new access token as response
     private IEnumerator RefreshTokenCoroutine(Action<bool> onComplete)
     {
         string refreshToken = PlayerPrefs.GetString("refreshToken", "");
@@ -88,7 +94,7 @@ public class TokenManager : MonoBehaviour
             yield break;
         }
 
-        string url = "http://localhost:8082/user/refreshToken"; // 백엔드 서버에 refresh토큰으로 access token을 반환해주는 엔드포인트 만들어야함
+        string url = "http://localhost:8080/user/refreshToken";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
         string json = JsonUtility.ToJson(new RefreshRequest { refreshToken = refreshToken });
 
@@ -103,15 +109,17 @@ public class TokenManager : MonoBehaviour
         {
             var jsonResponse = request.downloadHandler.text;
             var newTokenData = JsonUtility.FromJson<AuthDataWrapper>(jsonResponse);
-            if (newTokenData.success)//refresh유효한 경우
+            //if the refresh token is valid
+            if (newTokenData.success)
             {
                 SaveToken(newTokenData.data.accessToken, newTokenData.data.refreshToken);
                 Debug.Log("Access token refreshed.");
                 onComplete(true);
             }
-            else//refresh만료된 경우
+            //if the refresh token is invalid
+            else
             {
-                Debug.Log("Refresh token expired. Please login again");
+                Debug.Log("Refresh token invalid. Please login again");
                 onComplete(false);
             }
         }
@@ -122,8 +130,8 @@ public class TokenManager : MonoBehaviour
         }
     }
 
-    /*base64로 인코딩된 문자열을 보완함 설명
-     * unity의 Convert.FromBase64String()가 표준 base64 문자열만 허용하지만 jwt토큰은 base64Url이라는 형태로 변형된 형식이기 때문
+    /* Padding base64 incoded-string explanation
+     * Unity's Convert.FromBase64String() only allows standard base64 string, but the return type of jwt token is in incoded-type, the base64Url
      */
     private static string PadBase64(string base64)
     {
@@ -139,7 +147,7 @@ public class TokenManager : MonoBehaviour
         return base64.Replace('-', '+').Replace('_', '/');
     }
 
-    //refresh만료시 다시 로그인 화면으로 이동
+    //method to return to login scene if the refersh token is expired
     private void LoadLoginScene()
     {
         PlayerPrefs.DeleteKey("accessToken");
@@ -149,7 +157,7 @@ public class TokenManager : MonoBehaviour
     }
 }
 
-#region jwt토큰 만료 시간 데이터
+#region jwt token expiration time data
 [Serializable]
 public class JwtPayload
 {
@@ -157,7 +165,7 @@ public class JwtPayload
 }
 #endregion
 
-#region 서버에 refresh토큰을 보내서 새 access token 요청을 수행할 객체
+#region wrapper to send refresh token to server
 [Serializable]
 public class RefreshRequest
 {
@@ -165,7 +173,7 @@ public class RefreshRequest
 }
 #endregion
 
-#region authData객체
+#region authData wrapper
 [Serializable]
 public class AuthDataWrapper
 {

@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using static GameManager;
 
 public class BattleUnitSpawner : MonoBehaviour
 {
     private GameManager gameManager;
+
+    [SerializeField]
+    BattleManager battleManager;
 
     public Transform[] mySpawnPoints;
     public Transform[] opponentSpawnPoints;
@@ -41,15 +45,35 @@ public class BattleUnitSpawner : MonoBehaviour
 
     private IEnumerator SpawnAllUnits()
     {
-        gameManager.FetchSelectedMyDeck(myDeck =>
+        //gameManager.FetchSelectedMyDeck(myDeck =>
+        //{
+        //    for (int i = 0; i < myDeck.decklist.Count && i < mySpawnPoints.Length; i++)
+        //    {
+        //        string modelName = GetModelName(myDeck.decklist[i].card.name);
+        //        GameObject prefab = LoadAnimalPrefab(modelName);
+        //        if (prefab != null)
+        //        {
+        //            Instantiate(prefab, mySpawnPoints[i].position, Quaternion.identity);
+        //        }
+        //        else
+        //        {
+        //            Debug.LogWarning("No Prefab: " + modelName);
+        //        }
+        //    }
+        //});
+
+        string myDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
+        gameManager.FetchDeckById(myDeckId, myDeck =>
         {
-            for (int i = 0; i < myDeck.decklist.Count && i < mySpawnPoints.Length; i++)
+            for (int i = 0; i < myDeck.decklist.Count && i < opponentSpawnPoints.Length; i++)
             {
                 string modelName = GetModelName(myDeck.decklist[i].card.name);
                 GameObject prefab = LoadAnimalPrefab(modelName);
                 if (prefab != null)
                 {
-                    Instantiate(prefab, mySpawnPoints[i].position, Quaternion.identity);
+                    Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
+                    Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
+                    battleManager.SetMyDeck(prefab);
                 }
                 else
                 {
@@ -77,6 +101,29 @@ public class BattleUnitSpawner : MonoBehaviour
         //        }
         //    }
         //});
+
+        //njh
+        //selected opponent id is saved when the player selected the opponent's deck
+        //Get That deck information with the id
+        string opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+        gameManager.FetchDeckById(opponentDeckId, opponentDeck =>
+        {
+            for (int i = 0; i < opponentDeck.decklist.Count && i < opponentSpawnPoints.Length; i++)
+            {
+                string modelName = GetModelName(opponentDeck.decklist[i].card.name);
+                GameObject prefab = LoadAnimalPrefab(modelName);
+                if (prefab != null)
+                {
+                    Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
+                    Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
+                    battleManager.SetOpponentDeck(prefab);
+                }
+                else
+                {
+                    Debug.LogWarning("No Prefab: " + modelName);
+                }
+            }
+        });
     }
 
     private string GetModelName(string cardName)

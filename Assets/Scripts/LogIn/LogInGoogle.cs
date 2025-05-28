@@ -4,12 +4,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
+//njh
 public class LogInGoogle : MonoBehaviour
 {
     private string clientId = "533627938955-l5b18rcahau188jbu4ta1r6ik2m47o6l.apps.googleusercontent.com";
     private string redirectUri = "http://localhost:5000/";
 
-    //외부 브라우저를 열고 redirect uri로 code를 전달 -> uri가 유니티 로컬 서버인 경우 유니티로 전달됨
+    //Open outer browser and send code through redirect uri(In this case, uri is unity's local server
     public void signInWithGoogle()
     {
         string scope = Uri.EscapeDataString("openid email profile");

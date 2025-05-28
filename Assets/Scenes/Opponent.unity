@@ -885,9 +885,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ButtonManager, Assembly-CSharp
-        m_MethodName: homeButton
+      - m_Target: {fileID: 1870811978}
+        m_TargetAssemblyTypeName: SceneNavigator, Assembly-CSharp
+        m_MethodName: GoToHomeScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1643,6 +1643,7 @@ GameObject:
   - component: {fileID: 1870811974}
   - component: {fileID: 1870811976}
   - component: {fileID: 1870811977}
+  - component: {fileID: 1870811978}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1888,6 +1889,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseUrl: http://localhost:8080
   opponentDeckList: []
+--- !u!114 &1870811978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870811968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8968391c24a4282429efbfcee450d2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

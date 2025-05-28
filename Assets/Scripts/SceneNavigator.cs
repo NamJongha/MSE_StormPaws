@@ -23,4 +23,14 @@ public class SceneNavigator : MonoBehaviour
     {
         SceneManager.LoadScene("MyDeckSelect");
     }
+
+    public void GoToHomeScene()
+    {
+        SceneManager.LoadScene("HomeScreen");
+    }
+
+    public void StartBattleScene()
+    {
+        SceneManager.LoadScene("Battle");
+    }
 }

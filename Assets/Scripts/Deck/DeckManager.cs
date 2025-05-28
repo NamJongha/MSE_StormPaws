@@ -92,6 +92,7 @@ public class DeckManager : MonoBehaviour
                 {
                     ui.selectButton.onClick.RemoveAllListeners();
                     ui.selectButton.onClick.AddListener(() => deckDisplay.DisplayDeck(deck.decklist));
+                    ui.selectButton.onClick.AddListener(() => gameManager.SetSelectedMyDeck(deck));
                 }
             }
             else

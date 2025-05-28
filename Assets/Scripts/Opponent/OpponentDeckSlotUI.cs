@@ -46,6 +46,11 @@ public class OpponentDeckSlotUI : MonoBehaviour
         selectButton.onClick.RemoveAllListeners();
         selectButton.onClick.AddListener(() =>
         {
+            gameManager.SetSelectedOpponentDeck(selectedDeck);
+
+            PlayerPrefs.SetString("SelectedOpponentDeckId", selectedDeck.id);
+            PlayerPrefs.Save();
+
             SceneManager.LoadScene("MyDeckSelect");
         });
     }

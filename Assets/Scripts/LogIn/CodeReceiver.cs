@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using JetBrains.Annotations;
 using UnityEngine.Networking;
 
+//njh
 public class CodeReceiver : MonoBehaviour
 {
     private HttpListener httpListener;
@@ -31,7 +31,8 @@ public class CodeReceiver : MonoBehaviour
         }
     }
 
-    //httpListener는 백그라운드 스레드, UnityWebRequest는 메인 스레드에서 실행되야 함
+    //Http Listner should be run in background thread, and UnityWebRequest should be run in main thread
+    //**http listner keeps waiting until the response come, so it should be in background thread
     public void StartServer()
     {
         httpListener = new HttpListener();
@@ -71,14 +72,15 @@ public class CodeReceiver : MonoBehaviour
         await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
         response.Close();
 
-        // 메인 스레드로 전달
+        // send recieved authentication code to main thread
+        //StartCoroutine is executed in main thread, so the code recieved should be sended to main thread to put it as parameter of coroutine
         lock (receivedCodes)
         {
             receivedCodes.Enqueue(code);
         }
-        //코루틴의 start 자체는 메인 스레드에서 이루어지기 때문에 코루틴에 넣어줄 code를 메인으로 이동시켜줘야한다.
     }
 
+    //Send authentication code to Spring Server to get the JWT token
     private IEnumerator SendCodeCoroutine(string code)
     {
         string backendUrl = "http://localhost:8080/user/login/google";
@@ -104,7 +106,7 @@ public class CodeReceiver : MonoBehaviour
             string jsonResponse = request.downloadHandler.text;
             ResponseFromServer responseFromServer = JsonUtility.FromJson<ResponseFromServer>(jsonResponse);
 
-            string accessToken = responseFromServer.data.accessToken; //DTO클래스는 TokenManager 스크립트에 정의됨
+            string accessToken = responseFromServer.data.accessToken; //DTO class is declared in Token Manager Script
             string refreshToken = responseFromServer.data.refreshToken;
 
             Debug.Log("access: " + accessToken);

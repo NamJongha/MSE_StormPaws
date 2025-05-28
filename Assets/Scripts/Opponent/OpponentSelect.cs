@@ -20,6 +20,7 @@ public class OpponentSelect : MonoBehaviour
         StartCoroutine(GetOpponentDecks());
     }
 
+    //fetch 10 opponent's deck
     IEnumerator GetOpponentDecks()
     {
         string token = gameManager.GetAuthToken();
