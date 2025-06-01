@@ -915,11 +915,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: ae2031a5-8fb0-469f-a3bb-59f975d3c83d
+  cloudProjectId: 4b8c8d5b-a441-41d2-a955-a5322847a980
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: StormPaws 2025-04-08_13-33-37
-  organizationId: sirah31
+  projectName: StormPawsGit
+  organizationId: plazanimo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

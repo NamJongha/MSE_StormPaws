@@ -5,6 +5,7 @@ using TMPro;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 /// <summary>
 /// Battle Scene Manager Script
@@ -24,19 +25,31 @@ public class BattleManager : MonoBehaviour
     private int playerCharacterIndex;
     private int opponentCharacterIndex;
 
-    //private Dictionary<string, GameObject> actorMap = new Dictionary<string, GameObject>
-    //{
-    //    
-    //};
+    private string playerDeckId;
+    private string opponentDeckId;
+
+    [SerializeField]
+    private GameObject playerDamage;
+    [SerializeField]
+    private GameObject opponentDamage;
+
+    private bool isBattleOver = false;
 
     void Awake()
     {
+        playerCharacterIndex = 0;
+        opponentCharacterIndex = 0;
+
+        isBattleOver = false;
+
         playerCharacters = new List<GameObject>();
         opponentCharacters = new List<GameObject>();
     }
 
     void Start()
     {
+        playerDeckId = PlayerPrefs.GetString("SelectedPlayerDeckId", "");
+        opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
         StartCoroutine(FetchBattleEnvironment());
     }
 
@@ -90,8 +103,8 @@ public class BattleManager : MonoBehaviour
         {
             //change result json into meaningful data
             string json = request.downloadHandler.text;
-            BattleSimulation battleSimulation = JsonUtility.FromJson<BattleSimulation>(json);
-            StartCoroutine(PlayBattleSimulation(battleSimulation.simulation));
+            BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
+            StartCoroutine(PlayBattleSimulation(battleSimulation.data.logs));
         }
         else
         {
@@ -100,66 +113,69 @@ public class BattleManager : MonoBehaviour
     }
 
     //check the timestamp in log and do acutal attack according to the log /njh
-    private IEnumerator PlayBattleSimulation(List<BattleAction> actions)
+    private IEnumerator PlayBattleSimulation(List<BattleLog> logs)
     {
+
         float startTime = Time.time;
-        foreach (var action in actions)
+        foreach (var log in logs)
         {
+            //stop coroutine if the battle is over
+            if (isBattleOver == true)
+            {
+                yield break;
+            }
+
             float elapsed = Time.time - startTime;
-            float waitTime = action.timeStamp - elapsed;
+            float waitTime = log.timestamp - elapsed;
 
             if (waitTime > 0f)
                 yield return new WaitForSeconds(waitTime);
 
-            TriggerAttack(action.actorId, action.content);
+            TriggerAttack(log.attackerDeckId, log.damage, log.targetRemainingHp);
         }
     }
 
     //njh
-    private void TriggerAttack(string actorId, string content)
+    private void TriggerAttack(string actorDeckId, int damage, int remainingHp)
     {
-        /*if (!actorMap.ContainsKey(actorId) || !actorMap.ContainsKey(targetId))
-        {
-            Debug.LogWarning($"Unknown actor or target: {actorId} -> {targetId}");
-            return;
-        }
-
-        //Doing this with actorId might not work because same character of different deck have same ID
+        //Using only card ID(actoirId) might not work because same character of different deck have same ID
         //this might cause attacking twice when both character is same animal
-        GameObject actor = actorMap[actorId];
-        GameObject target = actorMap[targetId];
 
-        // Attacking animation
-        Animator animator = actor.GetComponent<Animator>();
-        if (animator != null)
-            animator.SetTrigger("Attack");
-
-        // Hit animation
-        Animator targetAnimator = target.GetComponent<Animator>();
-        if (targetAnimator != null)
-            targetAnimator.SetTrigger("Hit");
-        */
-
-        if(actorId == "player")
+        if(actorDeckId == playerDeckId)
         {
-            if (content == "attack")
+            playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
+            StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
+
+            if(remainingHp <= 0)
             {
-                playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            }
-            else if(content == "death")
-            {
-                playerCharacterIndex += 1;
+                opponentCharacters[opponentCharacterIndex].SetActive(false);
+                if (opponentCharacterIndex < 5)//if character is still left
+                {
+                    opponentCharacterIndex += 1;
+                }
+                else
+                {
+                    //end battle
+                    isBattleOver = true;
+                }
             }
         }
         else
         {
-            if(content == "attack")
+            opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
+            StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
+            if (remainingHp <= 0)
             {
-                opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            }
-            else if(content == "death")
-            {
-                opponentCharacterIndex += 1;
+                playerCharacters[opponentCharacterIndex].SetActive(false);
+                if (playerCharacterIndex < 5)
+                {
+                    playerCharacterIndex += 1;
+                }
+                else
+                {
+                    //end battle
+                    isBattleOver = true;
+                }
             }
         }
 
@@ -177,6 +193,27 @@ public class BattleManager : MonoBehaviour
             case "cloud": return "Èå¸²";
             default: return weather;
         }
+    }
+
+    private IEnumerator ShowDamage(GameObject target, int damage, string player)
+    {
+        if(player == "player")
+        {
+            playerDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
+            playerDamage.GetComponent<TMP_Text>().text = damage.ToString();
+            playerDamage.SetActive(true);
+            yield return new WaitForSeconds(2f);
+            playerDamage.SetActive(false);
+        }
+        else
+        {
+            opponentDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
+            opponentDamage.GetComponent<TMP_Text>().text = damage.ToString();
+            opponentDamage.SetActive(true);
+            yield return new WaitForSeconds(2f);
+            opponentDamage.SetActive(false);
+        }
+        
     }
 
     public void SetMyDeck(GameObject character)
@@ -206,15 +243,28 @@ public class BattleEnvData
 }
 
 [System.Serializable]
-public class BattleAction
+public class BattleLog
 {
-    public float timeStamp;
-    public string actorId;
-    public string content;
+    public float timestamp;
+    public string attackerDeckId;
+    public string attackerCardId;
+    public string targetDeckId;
+    public string targetCardId;
+    public int damage;
+    public int targetRemainingHp;
 }
 
 [System.Serializable]
-public class BattleSimulation
+public class BattleData
 {
-    public List<BattleAction> simulation;
+    public string winnerId;
+    public List<BattleLog> logs;
+}
+
+[System.Serializable]
+public class BattleSimulationLog
+{
+    public bool success;
+    public string message;
+    public BattleData data;
 }
