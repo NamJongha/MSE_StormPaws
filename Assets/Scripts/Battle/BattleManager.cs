@@ -105,6 +105,10 @@ public class BattleManager : MonoBehaviour
             string json = request.downloadHandler.text;
             BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
             StartCoroutine(PlayBattleSimulation(battleSimulation.data.logs));
+            if(isBattleOver == true)
+            {
+                //show result
+            }
         }
         else
         {
@@ -136,6 +140,15 @@ public class BattleManager : MonoBehaviour
     }
 
     //njh
+    /*How It Works
+     * It saves 5 characters of each deck in BattleUnitSpawner.cs
+     * After fetching simulation log from server, it reads log
+     * The log contains Deck Id, which can devide which player's character attacked.
+     * It compares the deck Id of attacker and check which player attacked
+     * Then, character of that deck acts attack
+     * -> This is for preventing that when each character is same, the Id is also same,
+     * so the character will attack and hit twice at a time if it checks only character id.
+     */
     private void TriggerAttack(string actorDeckId, int damage, int remainingHp)
     {
         //Using only card ID(actoirId) might not work because same character of different deck have same ID
