@@ -164,6 +164,34 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 26.23
       objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 8033929402336926347}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: GoToMyDeckScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: SceneNavigator, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 986402184027830459, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1487857051766076074, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -313,7 +341,7 @@ PrefabInstance:
       addedObject: {fileID: 2967722231474149359}
     - targetCorrespondingSourceObject: {fileID: 3301376321743224490, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2236391139795700240}
+      addedObject: {fileID: 8033929402336926347}
   m_SourcePrefab: {fileID: 100100000, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
 --- !u!114 &861545996327843893 stripped
 MonoBehaviour:
@@ -403,23 +431,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7af1d007e072dbc42b0583fc518ef4ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 2236391139795700240}
   ownerNameText: {fileID: 3013456380808066092}
+  num: {fileID: 1991074259750014241}
   animalImages:
   - {fileID: 7085620941917063708}
   - {fileID: 2702050167259838703}
   - {fileID: 861545996327843893}
   - {fileID: 8323103361855222817}
   - {fileID: 1724418883113821239}
-  selectButton: {fileID: 8634994527916675826}
-  num: {fileID: 1991074259750014241}
   animalNameTexts:
   - {fileID: 5094279686650320616}
   - {fileID: 8580414974474665748}
   - {fileID: 4638322540846992139}
   - {fileID: 8869775640778459776}
   - {fileID: 6428748569634117737}
---- !u!114 &2236391139795700240
+  selectButton: {fileID: 8634994527916675826}
+--- !u!114 &8033929402336926347
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -428,11 +455,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6319981907478861027}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fae834e3ac0a6843a76c2d52136b08b, type: 3}
+  m_Script: {fileID: 11500000, guid: 8968391c24a4282429efbfcee450d2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseUrl: http://localhost:8080
-  opponentDeckList: []
 --- !u!114 &6428748569634117737 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2545183093260038688, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}

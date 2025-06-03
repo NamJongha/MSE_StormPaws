@@ -1,59 +1,37 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using static GameManager;
-using static UnityEngine.Rendering.GPUSort;
+using Random = UnityEngine.Random;
 
-/// <summary>
-/// Deck Creation & Delete Manager Script
-/// </summary>
+[System.Serializable]
+public class NewDeckRequest
+{
+    public string name;
+    public List<DeckCardRequest> cards;
+}
+
+[System.Serializable]
+public class DeckCardRequest
+{
+    public string cardId;
+    public int quantity;
+    public int pos;
+}
 
 public class DeckManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class NewDeckRequest
-    {
-        public string name;
-        public List<DeckCardRequest> cards;
-    }
-
-    [System.Serializable]
-    public class DeckCardRequest
-    {
-        public string cardId;
-        public int quantity;
-        public int pos;
-    }
-
-    [System.Serializable]
-    public class AnimalSlotUI
-    {
-        public Image icon;
-        public TMP_Text nameText;
-    }
-
-    [System.Serializable]
-    public class SelectedDeckRequest
-    {
-        public string deckId;
-    }
-
     public GameObject createDeckButton;
     public AnimalSlotUI[] previewSlots;
     public GameObject createDeckPanel;
-
     public GameObject animalButtonPrefab;
     public Transform animalButtonContainer;
-
     public Transform deckSlotContainer;
     public GameObject deckSlotPrefab;
-
-    public GameManager gameManager;
     public DeckDisplay deckDisplay;
-
     public AudioSource click;
 
     private List<Card> allCards;
@@ -66,38 +44,25 @@ public class DeckManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Debug.Log("Deck Count: " + decks.Count);
-
         for (int i = 0; i < decks.Count; i++)
         {
             var deck = decks[i];
-
-            // Create Prefab Instance
             GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
-
-            // DeckSlotUI script
             DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
 
             if (ui != null)
             {
-                // Slot UI
-                ui.SetDeck(i, deck, gameManager);
-
-                // Delete Button
+                ui.SetDeck(i, deck);
                 string deckId = deck.id;
                 ui.deleteButton.onClick.RemoveAllListeners();
-                ui.deleteButton.onClick.AddListener(() => DeleteDeck(deckId));
+                //ui.deleteButton.onClick.AddListener(() => DeleteDeck(deckId));
 
                 if (deckDisplay != null)
                 {
                     ui.selectButton.onClick.RemoveAllListeners();
                     ui.selectButton.onClick.AddListener(() => deckDisplay.DisplayDeck(deck.decklist));
-                    ui.selectButton.onClick.AddListener(() => gameManager.SetSelectedMyDeck(deck));
+                    ui.selectButton.onClick.AddListener(() => GameManager.Instance.DeckService.SetSelectedMyDeck(deck));
                 }
-            }
-            else
-            {
-                Debug.LogError("No DeckSlotUI Component");
             }
         }
 
@@ -107,26 +72,18 @@ public class DeckManager : MonoBehaviour
     public void MyDeckSelect(List<DeckPreset> decks)
     {
         foreach (Transform child in deckSlotContainer)
-        {
             Destroy(child.gameObject);
-        }
-
-        Debug.Log("Deck Count: " + decks.Count);
 
         for (int i = 0; i < decks.Count; i++)
         {
             var deck = decks[i];
 
-            // Create Prefab Instance
             GameObject slotGO = Instantiate(deckSlotPrefab, deckSlotContainer);
-
-            // DeckSlotUI script
             DeckSlotUI ui = slotGO.GetComponent<DeckSlotUI>();
 
             if (ui != null)
             {
-                // 슬롯 내용 설정
-                ui.SetDeck(i, deck, gameManager);
+                ui.SetDeck(i, deck);
 
                 if (deckDisplay != null)
                 {
@@ -134,40 +91,12 @@ public class DeckManager : MonoBehaviour
                     ui.selectButton.onClick.AddListener(() => deckDisplay.DisplayDeck(deck.decklist));
                 }
             }
-            else
-            {
-                Debug.LogError("No DeckSlotUI Component");
-            }
-        }
-    }
-
-
-    // Deck Delete
-    public void DeleteDeck(string deckId)
-    {
-        StartCoroutine(DeleteDeckCoroutine(deckId));
-    }
-
-    private IEnumerator DeleteDeckCoroutine(string deckId)
-    {
-        UnityWebRequest req = UnityWebRequest.Delete($"{gameManager.baseUrl}/deck/{deckId}");
-        req.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
-        {
-            gameManager.FetchDeckPresets(DisplayDeckList);
-        }
-        else
-        {
-            Debug.LogError("Fail: " + req.error);
         }
     }
 
     public void InitCardList()
     {
-        gameManager.FetchAllCards((cards) =>
+        GameManager.Instance.DeckService.FetchAllCards(cards =>
         {
             allCards = cards;
             PopulateAnimalButtons();
@@ -176,78 +105,46 @@ public class DeckManager : MonoBehaviour
 
     public void PopulateAnimalButtons()
     {
-        if (allCards == null)
+        if (allCards == null || allCards.Count == 0)
         {
-            Debug.LogError("allCards is null");
-            return;
-        }
-
-        if (allCards.Count == 0)
-        {
-            Debug.LogWarning("allCards.Count == 0. Fail Parsing");
             return;
         }
 
         foreach (Card card in allCards)
         {
-            if (card == null)
-            {
-                Debug.LogWarning("Card is null");
-                continue;
-            }
-
-            if (string.IsNullOrEmpty(card.name))
-            {
-                Debug.LogWarning("Card name is null or empty");
-                continue;
-            }
-
             GameObject btn = Instantiate(animalButtonPrefab, animalButtonContainer);
-
-            // Text
             TMP_Text label = btn.transform.Find("AnimalName")?.GetComponent<TMP_Text>();
+
             if (label != null)
             {
                 label.text = card.name;
             }
 
-            // Image
             Image img = btn.transform.Find("AnimalImage")?.GetComponent<Image>();
+
             if (img != null)
             {
-                Sprite sprite = gameManager.LoadAnimalSprite(card.name);
-                if (sprite == null)
-                {
-                    Debug.LogWarning($"Sprite not found for card: {card.name}");
-                }
+                Sprite sprite = GameManager.Instance.SpriteLoader.Load(card.name);
                 img.sprite = sprite;
             }
 
-            // Click
             Button button = btn.GetComponent<Button>();
+
             if (button != null)
             {
                 string animalId = card.name;
                 button.onClick.AddListener(() => OnAnimalClicked(animalId));
             }
-            else
-            {
-                Debug.LogWarning("Button component not found on animalButtonPrefab");
-            }
 
-            // Tool tip
-            AnimalHoverTooltip hover = btn.GetComponent<AnimalHoverTooltip>();
-            if (hover == null) hover = btn.AddComponent<AnimalHoverTooltip>();
-
+            AnimalHoverTooltip hover = btn.GetComponent<AnimalHoverTooltip>() ?? btn.AddComponent<AnimalHoverTooltip>();
             hover.SetCard(card);
         }
-
     }
 
-    // Selecting Animal for Deck Creation
     public void OnAnimalClicked(string animalId)
     {
         Card found = allCards.Find(c => animalId.Equals(c.name));
+
         if (found == null)
         {
             return;
@@ -261,7 +158,6 @@ public class DeckManager : MonoBehaviour
         {
             if (selectedCards.Count >= 5)
             {
-                Debug.Log("Max: 5 Animals");
                 return;
             }
 
@@ -271,7 +167,6 @@ public class DeckManager : MonoBehaviour
         UpdateSelectedAnimalPreview();
     }
 
-    // Preview Panel for Deck Creation
     public void UpdateSelectedAnimalPreview()
     {
         for (int i = 0; i < previewSlots.Length; i++)
@@ -279,7 +174,7 @@ public class DeckManager : MonoBehaviour
             if (i < selectedCards.Count)
             {
                 previewSlots[i].nameText.text = selectedCards[i].name;
-                previewSlots[i].icon.sprite = gameManager.LoadAnimalSprite(selectedCards[i].name);
+                previewSlots[i].icon.sprite = GameManager.Instance.SpriteLoader.Load(selectedCards[i].name);
                 previewSlots[i].icon.gameObject.SetActive(true);
             }
             else
@@ -288,6 +183,23 @@ public class DeckManager : MonoBehaviour
                 previewSlots[i].icon.gameObject.SetActive(false);
             }
         }
+    }
+
+    public void confirmButton()
+    {
+        click.Play();
+
+        if (selectedCards.Count != 5)
+        {
+            Debug.Log("Select 5 animals");
+            return;
+        }
+
+        createDeckPanel.SetActive(false);
+
+        CreateDeck();
+        selectedCards.Clear();
+        UpdateSelectedAnimalPreview();
     }
 
     public void CreateDeck()
@@ -318,22 +230,21 @@ public class DeckManager : MonoBehaviour
         StartCoroutine(PostDeckCoroutine(json));
     }
 
-
     private IEnumerator PostDeckCoroutine(string json)
     {
-        UnityWebRequest request = new UnityWebRequest($"{gameManager.baseUrl}/user/me/decks", "POST");
+        UnityWebRequest request = new UnityWebRequest($"{GameManager.Instance.baseUrl}/user/me/decks", "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
+        request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
 
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
             Debug.Log("Success");
-            gameManager.FetchDeckPresets(DisplayDeckList);
+            GameManager.Instance.DeckService.FetchDeckPresets(DisplayDeckList);
         }
         else
         {
@@ -341,50 +252,8 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    public void confirmButton()
-    {
-        click.Play();
-
-        if (selectedCards.Count != 5)
-        {
-            Debug.Log("Select 5 animals");
-            return;
-        }
-
-        createDeckPanel.SetActive(false);
-
-        CreateDeck();
-        selectedCards.Clear();
-        UpdateSelectedAnimalPreview();
-    }
-
-    public void OnSelectMyDeckButtonClicked(string deckId)
-    {
-        StartCoroutine(SendSelectedMyDeck(deckId));
-    }
-
-    private IEnumerator SendSelectedMyDeck(string deckId)
-    {
-        SelectedDeckRequest payload = new SelectedDeckRequest { deckId = deckId };
-        string json = JsonUtility.ToJson(payload);
-
-        UnityWebRequest req = new UnityWebRequest($"{gameManager.baseUrl}/battle/select-my-deck", "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-        req.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        req.downloadHandler = new DownloadHandlerBuffer();
-        req.SetRequestHeader("Content-Type", "application/json");
-        req.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Success");
-        }
-        else
-        {
-            Debug.LogError("Fail: " + req.error);
-        }
-    }
-
+    //public void DeleteDeck(string deckId)
+    //{
+    //    GameManager.Instance.DeckService.DeleteDeck(deckId, DisplayDeckList);
+    //}
 }

@@ -1,22 +1,24 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Scene 관리를 위해 필요
+using UnityEngine.SceneManagement; // for Scene Management
+
+/// <summary>
+/// Scene Controller
+/// </summary>
 
 public class SceneNavigator : MonoBehaviour
 {
-    // Mypage 씬으로 이동하는 함수
+    // Method for moving to MyPage
     public void GoToMyPageScene()
     {
-        // "mypage"는 실제 씬 파일의 이름과 정확히 일치해야 합니다 (확장자 .unity 제외)
         SceneManager.LoadScene("MyPage");
-        Debug.Log("마이페이지 씬으로 이동 시도..."); // 확인용 로그
+        Debug.Log("Try to move to MyPage..."); // Debugging Log
     }
 
-    // Battle 씬으로 이동하는 함수
-    public void GoToBattleScene()
+    // Method for moving to Opponent
+    public void GoToOpponentSelect()
     {
-        // "battle"는 실제 씬 파일의 이름과 정확히 일치해야 합니다 (확장자 .unity 제외)
         SceneManager.LoadScene("Opponent");
-        Debug.Log("배틀 씬으로 이동 시도..."); // 확인용 로그
+        Debug.Log("Try to move to Opponent..."); // Debugging Log
     }
 
     public void GoToMyDeckScene()
@@ -29,7 +31,7 @@ public class SceneNavigator : MonoBehaviour
         SceneManager.LoadScene("HomeScreen");
     }
 
-    public void StartBattleScene()
+    public void GoToBattleScene()
     {
         SceneManager.LoadScene("Battle");
     }

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine;
 using System.Collections;
-using static GameManager;
 
 /// <summary>
 /// Selecting Opponent Deck Randomly for The Battle
@@ -12,8 +11,7 @@ public class OpponentSelect : MonoBehaviour
 {
     public GameObject deckSlotPrefab;
     public Transform slotParent;
-    public GameManager gameManager;
-    private List<GameManager.OpponentDeck> deckList;
+    private List<OpponentDeck> deckList;
 
     void Start()
     {
@@ -23,8 +21,8 @@ public class OpponentSelect : MonoBehaviour
     //fetch 10 opponent's deck
     IEnumerator GetOpponentDecks()
     {
-        string token = gameManager.GetAuthToken();
-        string url = $"{gameManager.baseUrl}/decks/random";
+        string token = GameManager.Instance.GetAuthToken();
+        string url = $"{GameManager.Instance.baseUrl}/decks/random";
 
         UnityWebRequest req = UnityWebRequest.Get(url);
         req.SetRequestHeader("Authorization", "Bearer " + token.Trim());
@@ -45,7 +43,7 @@ public class OpponentSelect : MonoBehaviour
             {
                 Debug.Log("Deck Count: " + response.data.items.Count);
                 deckList = response.data.items;
-                gameManager.SetOpponentDeckList(deckList);
+                GameManager.Instance.DeckService.SetOpponentDeckList(deckList);
 
                 foreach (Transform child in slotParent)
                 {

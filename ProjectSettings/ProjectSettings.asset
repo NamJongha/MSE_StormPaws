@@ -915,10 +915,10 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 4b8c8d5b-a441-41d2-a955-a5322847a980
+  cloudProjectId: 6d53dc07-dc0e-416f-9232-f8c10629d0ea
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: StormPawsGit
+  projectName: Stormpaws_final
   organizationId: plazanimo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

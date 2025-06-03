@@ -1,46 +1,57 @@
 using TMPro;
-using UnityEngine.EventSystems;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    private GameManager.Card card;
+    private Card card;
+
+    [Header("UI References")]
     public GameObject tooltipPanel;
     public TMP_Text tooltipText;
 
-    public void Start()
+    private void Start()
     {
-        tooltipPanel.SetActive(false);
+        if (tooltipPanel != null)
+            tooltipPanel.SetActive(false);
     }
 
-    public void SetCard(GameManager.Card c)
+    public void SetCard(Card cardData)
     {
-        card = c;
+        card = cardData;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (tooltipPanel == null || tooltipText == null) return;
+
         tooltipPanel.SetActive(true);
         ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        tooltipPanel.SetActive(false);
+        if (tooltipPanel != null)
+            tooltipPanel.SetActive(false);
     }
 
     private void ShowTooltip()
     {
         if (card == null)
         {
-            tooltipText.text = "No Info";
+            tooltipText.text = "No Info Available";
             return;
         }
 
-        tooltipText.text =
-            $"Name: {card.name}\n" +
-            $"HP: {card.health}\n" +
-            $"ATK: {card.attackPower}\n" +
-            $"Type: {card.cardType}";
+        tooltipText.text = GetTooltipText(card);
+    }
+
+    private string GetTooltipText(Card c)
+    {
+        return
+            $"Name: {c.name}\n" +
+            $"HP: {c.health}\n" +
+            $"Attack: {c.attackPower}\n" +
+            $"Type: {c.cardType}";
     }
 }

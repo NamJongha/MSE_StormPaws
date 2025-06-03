@@ -1,79 +1,71 @@
+using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static GameManager;
-
-/// <summary>
-/// Control Button Scirpt
-/// </summary>
 
 public class ButtonManager : MonoBehaviour
 {
-    public GameManager gameManager;
+    [Header("Managers")]
     public DeckManager deckManager;
     public RecordManager recordManager;
 
-    // For panel activation control
+    [Header("Panels")]
     public GameObject infoPanel;
     public GameObject deckPanel;
     public GameObject recordPanel;
     public GameObject deckCreatePanel;
 
-    // Button Click Sound
+    [Header("Audio")]
     public AudioSource buttonClick;
 
-    // Cached Data
+    // Cache
     private List<DeckPreset> cachedDecks = null;
     private List<BattleRecord> cachedBattles = null;
 
-    // Deck Button
+    // Panel Switch
+    private void SwitchToPanel(GameObject targetPanel)
+    {
+        infoPanel.SetActive(false);
+        deckPanel.SetActive(false);
+        recordPanel.SetActive(false);
+        deckCreatePanel.SetActive(false);
+
+        if (targetPanel != null)
+            targetPanel.SetActive(true);
+    }
+
     public void DeckButton()
     {
         if (cachedDecks != null)
         {
             deckManager.DisplayDeckList(cachedDecks);
-
-            return;
+        }
+        else
+        {
+            GameManager.Instance.DeckService.FetchDeckPresets(deckList =>
+            {
+                cachedDecks = deckList;
+                deckManager.DisplayDeckList(deckList);
+            });
         }
 
-        gameManager.FetchDeckPresets((deckList) =>
-        {
-            cachedDecks = deckList;
-
-            deckManager.DisplayDeckList(deckList);
-        });
-
-        deckPanel.SetActive(true);
-        infoPanel.SetActive(false);
-        recordPanel.SetActive(false);
-        deckCreatePanel.SetActive(false);
-
+        SwitchToPanel(deckPanel);
         buttonClick.Play();
     }
 
-    // Personal Info Button
     public void InfoButton()
     {
-        infoPanel.SetActive(true);
-        deckPanel.SetActive(false);
-        recordPanel.SetActive(false);
-        deckCreatePanel.SetActive(false);
-
+        SwitchToPanel(infoPanel);
         buttonClick.Play();
     }
 
-    // Deck Creation Button
     public void deckCreateButton()
     {
         deckCreatePanel.SetActive(true);
-        recordPanel.SetActive(false);
         deckManager.InitCardList();
-
         buttonClick.Play();
     }
 
-    // Record Button
     public void recordButton()
     {
         if (cachedBattles != null)
@@ -82,7 +74,7 @@ public class ButtonManager : MonoBehaviour
         }
         else
         {
-            gameManager.FetchBattleRecords((battleList) =>
+            GameManager.Instance.BattleService.FetchBattleRecords((battleList) =>
             {
                 cachedBattles = battleList;
 
@@ -96,12 +88,5 @@ public class ButtonManager : MonoBehaviour
         deckCreatePanel.SetActive(false);
 
         buttonClick.Play();
-    }
-
-    // Home Button
-    public void homeButton()
-    {
-        buttonClick.Play();
-        SceneManager.LoadScene("HomeScreen");
     }
 }

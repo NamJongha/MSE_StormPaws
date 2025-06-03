@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MyPage.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
     path: Assets/Scenes/Battle.unity
     guid: 6bcfe049d4096814ba03246b728a43a2
   - enabled: 1
@@ -20,9 +23,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Opponent.unity
     guid: b3883e03c11e5404caf793619a7f67cf
-  - enabled: 1
-    path: Assets/Scenes/MyPage.unity
-    guid: 35580e9367cab704cbc191b67f3c4c59
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

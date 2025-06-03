@@ -1642,7 +1642,6 @@ GameObject:
   - component: {fileID: 1870811973}
   - component: {fileID: 1870811974}
   - component: {fileID: 1870811976}
-  - component: {fileID: 1870811977}
   - component: {fileID: 1870811978}
   m_Layer: 0
   m_Name: GameManager
@@ -1680,7 +1679,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deckSlotPrefab: {fileID: 6319981907478861027, guid: 7cffb4debc3b8bc43b13754157ccef6b, type: 3}
   slotParent: {fileID: 791686565}
-  gameManager: {fileID: 1870811977}
 --- !u!82 &1870811974
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1875,20 +1873,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1870811977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870811968}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fae834e3ac0a6843a76c2d52136b08b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseUrl: http://localhost:8080
-  opponentDeckList: []
 --- !u!114 &1870811978
 MonoBehaviour:
   m_ObjectHideFlags: 0

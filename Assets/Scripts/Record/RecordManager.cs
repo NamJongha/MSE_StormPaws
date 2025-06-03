@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 
 /// <summary>
 /// Battle Record Script
@@ -11,10 +10,9 @@ using UnityEngine.UI;
 
 public class RecordManager : MonoBehaviour
 {
+    [Header("UI")]
     public GameObject battleRecordPrefab;
     public Transform battleRecordContainer;
-    public GameManager gameManager;
-
     public GameObject detailPanel;
     public TMP_Text detailText;
 
@@ -42,16 +40,17 @@ public class RecordManager : MonoBehaviour
 
     private IEnumerator FetchBattleDetail(string battleId)
     {
-        string url = $"{gameManager.baseUrl}/battle/detail/{battleId}";
+        string url = $"{GameManager.Instance.baseUrl}/battle/detail/{battleId}";
+
         UnityWebRequest req = UnityWebRequest.Get(url);
-        req.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
+        TokenManager.SendServerToken(req);
+        req.SetRequestHeader("Content-Type", "application/json");
 
         yield return req.SendWebRequest();
 
         if (req.result == UnityWebRequest.Result.Success)
         {
             BattleDetailDTO detail = JsonUtility.FromJson<BattleDetailDTO>(req.downloadHandler.text);
-
             detailText.text = FormatBattleDetail(detail);
             detailPanel.SetActive(true);
         }
@@ -61,10 +60,10 @@ public class RecordManager : MonoBehaviour
         }
     }
 
+    // for Detail Screen
     private string FormatBattleDetail(BattleDetailDTO detail)
     {
         string formatted = $"Battle ID: {detail.battleId}\nDate: {detail.date}\nResult: {detail.result}\n\n[Round]\n";
-
         foreach (var round in detail.rounds)
         {
             formatted += $" - {round.round}R: {round.action} (Damage: {round.damage})\n";
@@ -72,8 +71,7 @@ public class RecordManager : MonoBehaviour
         return formatted;
     }
 
-    // Display UI
-    public void DisplayBattleRecords(List<GameManager.BattleRecord> records)
+    public void DisplayBattleRecords(List<BattleRecord> records)
     {
         foreach (Transform child in battleRecordContainer)
         {
@@ -98,7 +96,7 @@ public class RecordManager : MonoBehaviour
                 if (j < myDeck.Length)
                 {
                     string animalName = myDeck[j];
-                    ui.myDeckSlots[j].icon.sprite = gameManager.LoadAnimalSprite(animalName);
+                    ui.myDeckSlots[j].icon.sprite = GameManager.Instance.SpriteLoader.Load(animalName);
                     ui.myDeckSlots[j].icon.gameObject.SetActive(true);
                 }
                 else
@@ -114,7 +112,7 @@ public class RecordManager : MonoBehaviour
                 if (j < opponentDeck.Length)
                 {
                     string animalName = opponentDeck[j];
-                    ui.opponentSlots[j].icon.sprite = gameManager.LoadAnimalSprite(animalName);
+                    ui.myDeckSlots[j].icon.sprite = GameManager.Instance.SpriteLoader.Load(animalName);
                     ui.opponentSlots[j].icon.gameObject.SetActive(true);
                 }
                 else
@@ -130,4 +128,3 @@ public class RecordManager : MonoBehaviour
         }
     }
 }
-

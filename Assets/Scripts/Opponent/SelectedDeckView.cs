@@ -1,60 +1,46 @@
-using System.Collections;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 
 public class SelectedDeckView : MonoBehaviour
 {
-    public GameManager gameManager;
+    [Header("Animal Slots")]
+    public AnimalSlotUI[] animalSlots;
 
-    [System.Serializable]
-    public class AnimalSlot
-    {
-        public Image icon;
-        public TMP_Text nameText;
-    }
-
-    public AnimalSlot[] animalSlots;
-
-    void Start()
+    private void Start()
     {
         string deckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+
         if (string.IsNullOrEmpty(deckId))
         {
             return;
         }
 
-        StartCoroutine(FetchDeckById(deckId));
+        GameManager.Instance.DeckService.FetchDeckById(deckId, OnDeckLoaded);
     }
 
-    IEnumerator FetchDeckById(string deckId)
+    private void OnDeckLoaded(DeckPreset deck)
     {
-        string url = $"{gameManager.baseUrl}/decks/{deckId}";
-        UnityWebRequest req = UnityWebRequest.Get(url);
-        req.SetRequestHeader("Authorization", "Bearer " + gameManager.GetAuthToken());
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
+        if (deck == null)
         {
-            var response = JsonUtility.FromJson<GameManager.SelectedOpponentResponse>(req.downloadHandler.text);
-            var deck = response.data;
+            Debug.LogWarning("Fail");
+            return;
+        }
 
-            for (int i = 0; i < animalSlots.Length; i++)
+        for (int i = 0; i < animalSlots.Length; i++)
+        {
+            if (i < deck.decklist.Count)
             {
-                if (i < deck.decklist.Count)
-                {
-                    var card = deck.decklist[i].card;
-                    animalSlots[i].icon.sprite = gameManager.LoadAnimalSprite(card.name);
-                    animalSlots[i].icon.color = Color.white;
-                    animalSlots[i].nameText.text = card.name;
-                }
-                else
-                {
-                    animalSlots[i].icon.gameObject.SetActive(false);
-                    animalSlots[i].nameText.text = "";
-                }
+                var card = deck.decklist[i].card;
+                Sprite sprite = GameManager.Instance.SpriteLoader.Load(card.name);
+
+                animalSlots[i].icon.sprite = sprite;
+                animalSlots[i].icon.color = Color.white;
+                animalSlots[i].nameText.text = card.name;
+                animalSlots[i].icon.gameObject.SetActive(true);
+            }
+            else
+            {
+                animalSlots[i].icon.gameObject.SetActive(false);
+                animalSlots[i].nameText.text = "";
             }
         }
     }
