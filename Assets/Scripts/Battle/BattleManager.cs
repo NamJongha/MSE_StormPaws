@@ -73,26 +73,31 @@ public class BattleManager : MonoBehaviour
         switch (weatherKey)
         {
             case "Fog":
+            case "Mist":
                 RenderSettings.skybox = fogSkybox;
                 break;
 
             case "Rain":
-            case "Thunder":
-            case "snowy":
-            case "sand":
+            case "Thunderstorm":
+            case "Snow":
+            case "Sand":
                 RenderSettings.skybox = rainySkybox;
                 break;
 
-            case "tornado":
+            case "Tornado":
                 RenderSettings.skybox = tornadoSkybox;
                 break;
 
-            case "clear":
+            case "Clear":
                 RenderSettings.skybox = clearSkybox;
                 break;
 
-            case "cloud":
+            case "Clouds":
                 RenderSettings.skybox = cloudSkybox;
+                break;
+
+            case "Gust":
+                RenderSettings.skybox = defaultSkybox;
                 break;
 
             default:
