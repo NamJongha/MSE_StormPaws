@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     public SpriteLoader SpriteLoader { get; private set; }
     public BattleService BattleService { get; private set; }
 
-    public string baseUrl => "http://localhost:8080";
+    public string baseUrl => "https://stormpaws.duckdns.org";
 
     private void Awake()
     {

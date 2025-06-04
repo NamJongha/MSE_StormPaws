@@ -35,4 +35,14 @@ public class SceneNavigator : MonoBehaviour
     {
         SceneManager.LoadScene("Battle");
     }
+
+    public void GoToAIBattle()
+    {
+        SceneManager.LoadScene("AIMode");
+    }
+
+    public void GoToAIOpponent()
+    {
+        SceneManager.LoadScene("AISelect");
+    }
 }

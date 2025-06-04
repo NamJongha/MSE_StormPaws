@@ -1824,8 +1824,8 @@ RectTransform:
   - {fileID: 1553149399}
   - {fileID: 990277058}
   - {fileID: 1797863281}
-  - {fileID: 1533611180}
   - {fileID: 188881806}
+  - {fileID: 1533611180}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4773,7 +4773,6 @@ MonoBehaviour:
   deckSlotContainer: {fileID: 1377262844}
   deckSlotPrefab: {fileID: 3301376321743224490, guid: dcafa66b8a71e134f8209d93eecfa629, type: 3}
   deckDisplay: {fileID: 0}
-  deckPanel: {fileID: 2096890176}
   click: {fileID: 1386371107}
 --- !u!114 &1386371111
 MonoBehaviour:
@@ -4876,8 +4875,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1955448553306655712, guid: 103ed4397ca7479479873ab55626ff41, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -408162529, guid: 4ae48cab12af4f14fbd2bfa7b98e7816, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
