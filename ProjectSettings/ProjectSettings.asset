@@ -915,6 +915,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
+  cloudProjectId: ae2031a5-8fb0-469f-a3bb-59f975d3c83d
+  framebufferDepthMemorylessMode: 0
+  qualitySettingsNames: []
+  projectName: StormPaws 2025-04-08_13-33-37
+  organizationId: sirah31
   cloudProjectId: 6d53dc07-dc0e-416f-9232-f8c10629d0ea
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []

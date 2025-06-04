@@ -83,7 +83,7 @@ public class CodeReceiver : MonoBehaviour
     //Send authentication code to Spring Server to get the JWT token
     private IEnumerator SendCodeCoroutine(string code)
     {
-        string backendUrl = "http://localhost:8080/user/login/google";
+        string backendUrl = "https://stormpaws.duckdns.org/user/login/google";
 
         CodePayload payload = new CodePayload { code = code };
         string json = JsonUtility.ToJson(payload);

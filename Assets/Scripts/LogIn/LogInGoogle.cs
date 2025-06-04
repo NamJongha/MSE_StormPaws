@@ -7,10 +7,9 @@ using UnityEngine.Networking;
 //njh
 public class LogInGoogle : MonoBehaviour
 {
-    private string clientId = "533627938955-l5b18rcahau188jbu4ta1r6ik2m47o6l.apps.googleusercontent.com";
+    private string clientId = "";
     private string redirectUri = "http://localhost:5000/";
 
-    //Open outer browser and send code through redirect uri(In this case, uri is unity's local server
     public void signInWithGoogle()
     {
         string scope = Uri.EscapeDataString("openid email profile");

@@ -33,11 +33,24 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(GameManager.Instance.BattleService.FetchBattleEnvironment(
-            OnEnvironmentReceived,
-            (error) => { Debug.LogError("Fail: " + error); }
-        ));
-        GameManager.Instance.BattleService.FetchBattleSimulationLog();
+        bool isAISimulation = PlayerPrefs.GetInt("IsAISimulation", 0) == 1;
+
+        if (isAISimulation)
+        {
+            string weather = PlayerPrefs.GetString("SimulatedWeather", "Clear");
+            BattleEnvData env = new BattleEnvData { weather = weather, city = "Simulation" };
+            OnEnvironmentReceived(env);
+
+            GameManager.Instance.StartCoroutine(GameManager.Instance.BattleService.PlayAISimulation());
+        }
+        else
+        {
+            StartCoroutine(GameManager.Instance.BattleService.FetchBattleEnvironment(
+                OnEnvironmentReceived,
+                (error) => { Debug.LogError("Fail: " + error); }
+            ));
+            GameManager.Instance.BattleService.FetchBattleSimulationLog();
+        }
     }
 
     private void OnEnvironmentReceived(BattleEnvData env)
@@ -73,26 +86,31 @@ public class BattleManager : MonoBehaviour
         switch (weatherKey)
         {
             case "Fog":
+            case "Mist":
                 RenderSettings.skybox = fogSkybox;
                 break;
 
             case "Rain":
-            case "Thunder":
-            case "snowy":
-            case "sand":
+            case "Thunderstorm":
+            case "Snow":
+            case "Sand":
                 RenderSettings.skybox = rainySkybox;
                 break;
 
-            case "tornado":
+            case "Tornado":
                 RenderSettings.skybox = tornadoSkybox;
                 break;
 
-            case "clear":
+            case "Clear":
                 RenderSettings.skybox = clearSkybox;
                 break;
 
-            case "cloud":
+            case "Clouds":
                 RenderSettings.skybox = cloudSkybox;
+                break;
+
+            case "Gust":
+                RenderSettings.skybox = defaultSkybox;
                 break;
 
             default:

@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -70,7 +70,7 @@ public class BattleService
             if (response.success)
                 onSuccess?.Invoke(response.data);
             else
-                onError?.Invoke("¿¸≈ı »Ø∞Ê ¿¿¥‰ Ω«∆–");
+                onError?.Invoke("√Ä√º√Ö√µ √à¬Ø¬∞√¶ √Ä√Ä¬¥√§ ¬Ω√á√Ü√ê");
         }
         else
         {
@@ -217,6 +217,35 @@ public class BattleService
             BattleRecordListWrapper wrapper = JsonUtility.FromJson<BattleRecordListWrapper>(json);
             callback?.Invoke(wrapper.data);
         }));
+    }
+
+    // For AI Simulation
+    public IEnumerator PlayAISimulation()
+    {
+        var logs = new List<BattleLog>();
+        float currentTime = 0f;
+        System.Random rand = new();
+
+        playerDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
+        opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+
+        for (int i = 0; i < 5; i++)
+        {
+            logs.Add(new BattleLog
+            {
+                timestamp = currentTime,
+                attackerDeckId = (i % 2 == 0) ? playerDeckId : opponentDeckId,
+                targetDeckId = (i % 2 == 0) ? opponentDeckId : playerDeckId,
+                attackerCardId = "sim_attacker_" + i,
+                targetCardId = "sim_target_" + i,
+                damage = rand.Next(8, 20),
+                targetRemainingHp = rand.Next(0, 30)
+            });
+
+            currentTime += 1.5f;
+        }
+
+        yield return GameManager.Instance.StartCoroutine(PlayBattleSimulation(logs));
     }
 }
 
