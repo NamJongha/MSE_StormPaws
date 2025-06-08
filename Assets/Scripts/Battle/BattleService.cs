@@ -28,18 +28,14 @@ public class BattleService
     private string playerDeckId;
     private string opponentDeckId;
 
-    [SerializeField]
+    private string playerId;
+    private string opponentId;
+
     private GameObject playerDamage;
-    [SerializeField]
     private GameObject opponentDamage;
 
     private bool isBattleOver = false;
-
-    void Awake()
-    {
-        playerCharacters = new List<GameObject>();
-        opponentCharacters = new List<GameObject>();
-    }
+    private string weatherId;
 
     public void ResetState()
     {
@@ -59,7 +55,7 @@ public class BattleService
     {
         string url = $"{GameManager.Instance.baseUrl}/weather/random";
         UnityWebRequest request = UnityWebRequest.Get(url);
-        TokenManager.SendServerToken(request);
+        //TokenManager.SendServerToken(request);
         request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
 
         yield return request.SendWebRequest();
@@ -70,6 +66,7 @@ public class BattleService
 
             if (response != null)
             {
+                weatherId = response.data.id;
                 onSuccess?.Invoke(response.data);
             }
         }
@@ -78,14 +75,42 @@ public class BattleService
     //get battle simulation result
     public IEnumerator FetchBattleSimulationLog()
     {
-        string url = $"{GameManager.Instance.baseUrl}/battle/result";
-        UnityWebRequest request = UnityWebRequest.Get(url);
+        Debug.Log("Start Battle");
+
+        playerDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
+        opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+
+        playerId = PlayerPrefs.GetString("PlayerId", "");
+        opponentId = PlayerPrefs.GetString("SelectedOpponentUserId", "");
+
+        BattleRequestDto requestData = new BattleRequestDto
+        {
+            attackerDeckId = playerDeckId,
+            attackerUserId = playerId,
+            defenderDeckId = opponentDeckId,
+            defenderUserId = opponentId,
+            weatherLogId = weatherId,
+
+
+        };
+
+        string jsonData = JsonUtility.ToJson(requestData);
+        Debug.Log(jsonData);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+
+        string url = $"{GameManager.Instance.baseUrl}/battles/pvp";
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
 
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
+            Debug.Log("Successfully fetched simulation");
             //change result json into meaningful data
             string json = request.downloadHandler.text;
             BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
@@ -94,13 +119,16 @@ public class BattleService
         else
         {
             Debug.LogError("Failed to fetch battle result");
+            Debug.Log($"Response Code: {request.responseCode}");
+            Debug.Log($"Error Message: {request.downloadHandler.text}");
         }
     }
 
     //check the timestamp in log and do acutal attack according to the log /njh
     private IEnumerator PlayBattleSimulation(List<BattleLog> logs)
     {
-
+        Debug.Log("Start Battle");
+        Debug.Log(isBattleOver);
         float startTime = Time.time;
         foreach (var log in logs)
         {
@@ -138,38 +166,46 @@ public class BattleService
     {
         if (actorDeckId == playerDeckId)
         {
-            playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            GameManager.Instance.StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
+            Debug.Log("player attack" + damage);
+            //playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
+            //GameManager.Instance.StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
 
             if (remainingHp <= 0)
             {
-                opponentCharacters[opponentCharacterIndex].SetActive(false);
+                Debug.Log("character dead");
+                opponentCharacters[opponentCharacterIndex].SetActive(false); // not working
                 if (opponentCharacterIndex < 5)//if character is still left
                 {
                     opponentCharacterIndex += 1;
-                }
-                else
-                {
-                    //end battle
-                    isBattleOver = true;
-                }
+                    if(opponentCharacterIndex >= 5)
+                    {
+                        Debug.Log("Battle Ended");
+                        //end battle
+                        isBattleOver = true;
+                    }
+                }      
             }
         }
         else
         {
-            opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
+            Debug.Log("opponent attack" + damage);
+            //opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
+            //GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
             if (remainingHp <= 0)
             {
+                Debug.Log("character dead");
                 playerCharacters[playerCharacterIndex].SetActive(false);
                 if (playerCharacterIndex < 5)
                 {
                     playerCharacterIndex += 1;
-                }
-                else
-                {
-                    //end battle
-                    isBattleOver = true;
+                    if(playerCharacterIndex >= 5)
+                    {
+                        {
+                            Debug.Log("Battle Ended");
+                            //end battle
+                            isBattleOver = true;
+                        }
+                    }
                 }
             }
         }
@@ -258,6 +294,7 @@ public class BattleEnvResponse
 [System.Serializable]
 public class BattleEnvData
 {
+    public string id;
     public string city;
     public string weatherType;
 }
@@ -296,4 +333,14 @@ public class BattleLog
 public class BattleRecordListWrapper
 {
     public List<BattleRecord> data;
+}
+
+[System.Serializable]
+public class BattleRequestDto
+{
+    public string attackerDeckId;
+    public string attackerUserId;
+    public string defenderDeckId;
+    public string defenderUserId;
+    public string weatherLogId;
 }

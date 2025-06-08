@@ -20,7 +20,7 @@ public class BattleUnitSpawner : MonoBehaviour
         { "ÇÜ½ºÅÍ", "Hamster" },
         { "¸ñµµ¸® µµ¸¶¹ì", "Geko" },
         { "»çÀÚ", "Lion" },
-        { "Èò¼ö¿°°í·¡", "Whale" },
+        { "Èò¼ö¿° °í·¡", "Whale" },
         { "¿ø¼þÀÌ", "Monkey" },
         { "¸»", "Horse" },
         { "È£¶ûÀÌ", "Tiger" },
@@ -49,7 +49,7 @@ public class BattleUnitSpawner : MonoBehaviour
                 if (prefab != null)
                 {
                     Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
-                    Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
+                    Instantiate(prefab, mySpawnPoints[i].position, rotation);
                     GameManager.Instance.BattleService.SetMyDeck(prefab);
                 }
                 else

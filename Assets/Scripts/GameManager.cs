@@ -36,6 +36,18 @@ public class GameManager : MonoBehaviour
         BattleService = new BattleService();
     }
 
+    private void Start()
+    {
+        StartCoroutine(
+            GetRequest($"{baseUrl}/user/me", (json) =>
+            {
+                PersonalInfoWrapper wrapper = JsonUtility.FromJson<PersonalInfoWrapper>(json);
+                string playerId = wrapper.data.id;
+                PlayerPrefs.SetString("PlayerId", playerId);
+                Debug.Log(playerId + "saved successfully");
+            }));
+    }
+
     public string GetAuthToken()
     {
         return PlayerPrefs.GetString("accessToken");
@@ -53,10 +65,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator GetRequest(string url, Action<string> onSuccess, Action<string> onError = null)
     {
-        Debug.Log($"[GET Request] {url}");
-
         string token = GetAuthToken();
-        Debug.Log($"JWT Token: {token}");
 
         UnityWebRequest request = UnityWebRequest.Get(url);
         string authHeader = $"Bearer {token.Trim()}";

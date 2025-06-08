@@ -10,6 +10,8 @@ public class DeckService
     private string selectedMyDeckId;
     private string selectedOpponentDeckId;
 
+    private string selectedOpponentUserId;
+
     public void FetchAllCards(Action<List<Card>> callback)
     {
         GameManager.Instance.StartCoroutine(
@@ -62,8 +64,12 @@ public class DeckService
     public void SetSelectedOpponentDeck(OpponentDeck deck)
     {
         selectedOpponentDeckId = deck.id;
+        selectedOpponentUserId = deck.user.id;
 
         PlayerPrefs.SetString("SelectedOpponentDeckId", deck.id);
+        PlayerPrefs.SetString("SelectedOpponentUserId", deck.user.id);
+
+        Debug.Log("oppo" + selectedOpponentUserId);
         PlayerPrefs.Save();
     }
 

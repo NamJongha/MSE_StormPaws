@@ -43,7 +43,7 @@ public class OpponentSelect : MonoBehaviour
             {
                 Debug.Log("Deck Count: " + response.data.items.Count);
                 deckList = response.data.items;
-                GameManager.Instance.DeckService.SetOpponentDeckList(deckList);
+                GameManager.Instance.DeckService.SetOpponentDeckList(deckList);/**/
 
                 foreach (Transform child in slotParent)
                 {
