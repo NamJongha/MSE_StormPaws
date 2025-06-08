@@ -29,58 +29,16 @@ public class AISimulationManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(FetchWeatherProbability());
+        SetupWeatherDropdown();
+
         GameManager.Instance.DeckService.FetchDeckPresets((list) =>
         {
             myDecks = list;
             PopulateMyDeckList();
         });
+
         StartCoroutine(FetchAIDecksFromServer());
         simulateButton.onClick.AddListener(RunSimulation);
-    }
-
-    IEnumerator FetchWeatherProbability()
-    {
-        string url = GameManager.Instance.baseUrl + "/weather/cities";
-        UnityWebRequest req = UnityWebRequest.Get(url);
-        req.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
-        {
-            var data = JsonUtility.FromJson<WeatherData>(req.downloadHandler.text);
-            var builder = new System.Text.StringBuilder();
-
-            List<string> weatherOptions = new(data.weatherProbabilities.Keys);
-
-            builder.AppendLine("Today's Weather Probability:");
-            foreach (var entry in data.weatherProbabilities)
-            {
-                builder.AppendLine($"- {entry.Key}: {entry.Value}%");
-            }
-
-            weatherProbabilityText.text = builder.ToString();
-
-            weatherDropdown.ClearOptions();
-            weatherDropdown.AddOptions(weatherOptions);
-
-            weatherDropdown.onValueChanged.AddListener(i =>
-            {
-                selectedWeather = weatherOptions[i];
-            });
-
-            if (weatherOptions.Count > 0)
-            {
-                weatherDropdown.value = 0;
-                weatherDropdown.RefreshShownValue();
-                selectedWeather = weatherOptions[0];
-            }
-        }
-        else
-        {
-            weatherProbabilityText.text = "Weather Info Load Fail";
-        }
     }
 
 
@@ -199,7 +157,7 @@ public class AISimulationManager : MonoBehaviour
     }
 
 
-    void RunSimulation()
+    public void RunSimulation()
     {
         if (selectedMyDeck == null || selectedAIDeck == null || string.IsNullOrEmpty(selectedWeather))
         {
@@ -209,10 +167,40 @@ public class AISimulationManager : MonoBehaviour
 
         PlayerPrefs.SetInt("IsAISimulation", 1);
         PlayerPrefs.SetString("SimulatedWeather", selectedWeather);
+        PlayerPrefs.Save();
         GameManager.Instance.DeckService.SetSelectedMyDeck(selectedMyDeck);
         GameManager.Instance.DeckService.SetSelectedOpponentDeck(selectedAIDeck);
 
         SceneManager.LoadScene("AIMode");
+    }
+
+    public void OnWeatherDropdownChanged(int index)
+    {
+        if (index < 0 || index >= weatherDropdown.options.Count)
+        {
+            return;
+        }
+
+        selectedWeather = weatherDropdown.options[index].text.ToUpper();
+    }
+
+    private void SetupWeatherDropdown()
+    {
+        weatherDropdown.ClearOptions();
+
+        List<string> weatherOptions = new()
+    {
+        "CLEAR", "CLOUDS", "RAIN", "SNOW", "MIST", "FOG", "THUNDERSTORM", "SAND", "GUST", "TORNADO"
+    };
+
+        weatherDropdown.AddOptions(weatherOptions);
+
+        weatherDropdown.value = 0;
+        weatherDropdown.RefreshShownValue();
+        selectedWeather = weatherOptions[0];
+
+        weatherDropdown.onValueChanged.RemoveAllListeners();
+        weatherDropdown.onValueChanged.AddListener(OnWeatherDropdownChanged);
     }
 
     [System.Serializable]

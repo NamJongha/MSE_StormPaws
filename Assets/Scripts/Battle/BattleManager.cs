@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+癤퓎sing System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -21,32 +21,11 @@ public class BattleManager : MonoBehaviour
     private Dictionary<string, GameObject> backgroundMap = new();
     private GameObject currentBackground;
 
-    private static readonly Dictionary<string, string> koreanToEnglishWeather = new()
-    {
-        { "클리어", "Clear" },
-        { "클라우드", "Clouds" },
-        { "레인", "Rain" },
-        { "스노우", "Snow" },
-        { "포그", "Fog" },
-        { "미스트", "Mist" },
-        { "썬더스톰", "Thunderstorm" },
-        { "황사", "Sand" },
-        { "토네이도", "Tornado" },
-        { "돌풍", "Gust" }
-    };
-
-    private string ConvertWeatherToEnglish(string koreanWeather)
-    {
-        return koreanToEnglishWeather.TryGetValue(koreanWeather, out var eng)
-            ? eng
-            : "Default";
-    }
-
     private void Awake()
     {
         foreach (Transform child in backgroundContainer)
         {
-            backgroundMap[child.name.ToLower()] = child.gameObject;
+            backgroundMap[child.name.ToUpper()] = child.gameObject;
             child.gameObject.SetActive(false);
         }
     }
@@ -57,10 +36,9 @@ public class BattleManager : MonoBehaviour
 
         if (isAISimulation)
         {
-            string rawWeather = PlayerPrefs.GetString("SimulatedWeather", "클리어");
-            string weather = ConvertWeatherToEnglish(rawWeather);
+            string weather = PlayerPrefs.GetString("SimulatedWeather", "CLEAR").ToUpper();
 
-            BattleEnvData env = new BattleEnvData { weather = weather, city = "Simulation" };
+            BattleEnvData env = new BattleEnvData { weatherType = weather, city = "Simulation" };
             OnEnvironmentReceived(env);
 
             GameManager.Instance.StartCoroutine(GameManager.Instance.BattleService.PlayAISimulation());
@@ -70,7 +48,7 @@ public class BattleManager : MonoBehaviour
             StartCoroutine(GameManager.Instance.BattleService.FetchBattleEnvironment(
                 (env) =>
                 {
-                    env.weather = ConvertWeatherToEnglish(env.weather);
+                    env.weatherType = env.weatherType?.ToUpper();
                     OnEnvironmentReceived(env);
                 },
                 (error) => { Debug.LogError("Fail: " + error); }
@@ -82,21 +60,14 @@ public class BattleManager : MonoBehaviour
 
     private void OnEnvironmentReceived(BattleEnvData env)
     {
-        if (env == null)
+        if (env == null || string.IsNullOrEmpty(env.weatherType))
         {
-            Debug.LogError("Fail");
             return;
         }
 
-        weatherText.text = env.weather.ToLower();
+        string weatherKey = env.weatherType.ToUpper();
+        weatherText.text = weatherKey;
         cityText.text = env.city;
-
-        string weatherKey = env.weather.ToLower();
-
-        if (currentBackground != null)
-        {
-            currentBackground.SetActive(false);
-        }
 
         if (backgroundMap.TryGetValue(weatherKey, out var bg))
         {
@@ -104,7 +75,12 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            backgroundMap.TryGetValue("default", out currentBackground);
+            currentBackground = null;
+        }
+
+        if (currentBackground != null)
+        {
+            currentBackground.SetActive(true);
         }
 
         currentBackground?.SetActive(true);
@@ -112,31 +88,31 @@ public class BattleManager : MonoBehaviour
         // Skybox
         switch (weatherKey)
         {
-            case "fog":
-            case "mist":
+            case "FOG":
+            case "MIST":
                 RenderSettings.skybox = fogSkybox;
                 break;
 
-            case "rain":
-            case "thunderstorm":
-            case "snow":
-            case "sand":
+            case "RAIN":
+            case "THUNDERSTORM":
+            case "SNOW":
+            case "SAND":
                 RenderSettings.skybox = rainySkybox;
                 break;
 
-            case "tornado":
+            case "TORNADO":
                 RenderSettings.skybox = tornadoSkybox;
                 break;
 
-            case "clear":
+            case "CLEAR":
                 RenderSettings.skybox = clearSkybox;
                 break;
 
-            case "clouds":
+            case "CLOUDS":
                 RenderSettings.skybox = cloudSkybox;
                 break;
 
-            case "gust":
+            case "GUST":
                 RenderSettings.skybox = defaultSkybox;
                 break;
 

@@ -57,9 +57,9 @@ public class BattleService
 
     public IEnumerator FetchBattleEnvironment(Action<BattleEnvData> onSuccess, Action<string> onError)
     {
-        string url = $"{GameManager.Instance.baseUrl}/battle/environment";
+        string url = $"{GameManager.Instance.baseUrl}/weather/random";
         UnityWebRequest request = UnityWebRequest.Get(url);
-        //TokenManager.SendServerToken(request);
+        TokenManager.SendServerToken(request);
         request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
 
         yield return request.SendWebRequest();
@@ -67,14 +67,11 @@ public class BattleService
         if (request.result == UnityWebRequest.Result.Success)
         {
             BattleEnvResponse response = JsonUtility.FromJson<BattleEnvResponse>(request.downloadHandler.text);
-            if (response.success)
+
+            if (response != null)
+            {
                 onSuccess?.Invoke(response.data);
-            else
-                onError?.Invoke("ÀüÅõ È¯°æ ÀÀ´ä ½ÇÆÐ");
-        }
-        else
-        {
-            onError?.Invoke(request.error);
+            }
         }
     }
 
@@ -261,8 +258,8 @@ public class BattleEnvResponse
 [System.Serializable]
 public class BattleEnvData
 {
-    public string weather;
     public string city;
+    public string weatherType;
 }
 
 [System.Serializable]

@@ -13,7 +13,7 @@ public class DeckService
     public void FetchAllCards(Action<List<Card>> callback)
     {
         GameManager.Instance.StartCoroutine(
-            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=100",
+            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=10",
             (json) =>
             {
                 CardListResponse wrapper = JsonUtility.FromJson<CardListResponse>(json);
