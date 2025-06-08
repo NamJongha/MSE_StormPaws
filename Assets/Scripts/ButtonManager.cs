@@ -89,4 +89,29 @@ public class ButtonManager : MonoBehaviour
 
         buttonClick.Play();
     }
+
+    public void OnLanguageDropdownChanged(int index)
+    {
+        LanguageTranslate.CurrentLanguage = (LanguageTranslate.Language)index;
+
+        RefreshAllUI();
+    }
+
+    private void RefreshAllUI()
+    {
+        if (cachedDecks != null)
+        {
+            deckManager.DisplayDeckList(cachedDecks);
+        }
+
+        if (cachedBattles != null)
+        {
+            recordManager.DisplayBattleRecords(cachedBattles);
+        }
+
+        if (deckCreatePanel.activeSelf)
+        {
+            deckManager.InitCardList();
+        }
+    }
 }

@@ -34,7 +34,7 @@ public class SelectedDeckView : MonoBehaviour
 
                 animalSlots[i].icon.sprite = sprite;
                 animalSlots[i].icon.color = Color.white;
-                animalSlots[i].nameText.text = card.name;
+                animalSlots[i].nameText.text = LanguageTranslate.GetDisplayName(card.name);
                 animalSlots[i].icon.gameObject.SetActive(true);
             }
             else

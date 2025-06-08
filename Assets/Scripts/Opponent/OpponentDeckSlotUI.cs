@@ -27,7 +27,7 @@ public class OpponentDeckSlotUI : MonoBehaviour
                 var card = deck.decklist[i].card;
                 animalImages[i].sprite = spriteLoader.Load(card.name);
                 animalImages[i].gameObject.SetActive(true);
-                animalNameTexts[i].text = card.name;
+                animalNameTexts[i].text = LanguageTranslate.GetDisplayName(card.name);
                 animalNameTexts[i].gameObject.SetActive(true);
             }
             else

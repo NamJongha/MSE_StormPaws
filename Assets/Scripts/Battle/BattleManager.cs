@@ -5,7 +5,6 @@ using UnityEngine;
 /// <summary>
 /// Battle Environment Manager
 /// </summary>
-
 public class BattleManager : MonoBehaviour
 {
     public Transform backgroundContainer;
@@ -22,6 +21,27 @@ public class BattleManager : MonoBehaviour
     private Dictionary<string, GameObject> backgroundMap = new();
     private GameObject currentBackground;
 
+    private static readonly Dictionary<string, string> koreanToEnglishWeather = new()
+    {
+        { "클리어", "Clear" },
+        { "클라우드", "Clouds" },
+        { "레인", "Rain" },
+        { "스노우", "Snow" },
+        { "포그", "Fog" },
+        { "미스트", "Mist" },
+        { "썬더스톰", "Thunderstorm" },
+        { "황사", "Sand" },
+        { "토네이도", "Tornado" },
+        { "돌풍", "Gust" }
+    };
+
+    private string ConvertWeatherToEnglish(string koreanWeather)
+    {
+        return koreanToEnglishWeather.TryGetValue(koreanWeather, out var eng)
+            ? eng
+            : "Default";
+    }
+
     private void Awake()
     {
         foreach (Transform child in backgroundContainer)
@@ -37,7 +57,9 @@ public class BattleManager : MonoBehaviour
 
         if (isAISimulation)
         {
-            string weather = PlayerPrefs.GetString("SimulatedWeather", "Clear");
+            string rawWeather = PlayerPrefs.GetString("SimulatedWeather", "클리어");
+            string weather = ConvertWeatherToEnglish(rawWeather);
+
             BattleEnvData env = new BattleEnvData { weather = weather, city = "Simulation" };
             OnEnvironmentReceived(env);
 
@@ -46,9 +68,14 @@ public class BattleManager : MonoBehaviour
         else
         {
             StartCoroutine(GameManager.Instance.BattleService.FetchBattleEnvironment(
-                OnEnvironmentReceived,
+                (env) =>
+                {
+                    env.weather = ConvertWeatherToEnglish(env.weather);
+                    OnEnvironmentReceived(env);
+                },
                 (error) => { Debug.LogError("Fail: " + error); }
             ));
+
             GameManager.Instance.BattleService.FetchBattleSimulationLog();
         }
     }
@@ -85,31 +112,31 @@ public class BattleManager : MonoBehaviour
         // Skybox
         switch (weatherKey)
         {
-            case "Fog":
-            case "Mist":
+            case "fog":
+            case "mist":
                 RenderSettings.skybox = fogSkybox;
                 break;
 
-            case "Rain":
-            case "Thunderstorm":
-            case "Snow":
-            case "Sand":
+            case "rain":
+            case "thunderstorm":
+            case "snow":
+            case "sand":
                 RenderSettings.skybox = rainySkybox;
                 break;
 
-            case "Tornado":
+            case "tornado":
                 RenderSettings.skybox = tornadoSkybox;
                 break;
 
-            case "Clear":
+            case "clear":
                 RenderSettings.skybox = clearSkybox;
                 break;
 
-            case "Clouds":
+            case "clouds":
                 RenderSettings.skybox = cloudSkybox;
                 break;
 
-            case "Gust":
+            case "gust":
                 RenderSettings.skybox = defaultSkybox;
                 break;
 

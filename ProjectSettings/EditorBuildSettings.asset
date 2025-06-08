@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Login.unity
     guid: c94e4f3327956d14a88477346b7e3581
+  - enabled: 1
+    path: Assets/Scenes/MyPage.unity
+    guid: 35580e9367cab704cbc191b67f3c4c59
   - enabled: 1
     path: Assets/Scenes/MyDeckSelect.unity
     guid: 679e28dd92e786342b7944447228f70c

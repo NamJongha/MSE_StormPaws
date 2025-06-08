@@ -13,7 +13,7 @@ public class DeckService
     public void FetchAllCards(Action<List<Card>> callback)
     {
         GameManager.Instance.StartCoroutine(
-            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=10",
+            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=100",
             (json) =>
             {
                 CardListResponse wrapper = JsonUtility.FromJson<CardListResponse>(json);
@@ -51,7 +51,7 @@ public class DeckService
             return;
         }
 
-        GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/user/me/decks?page=1&size=10", (json) =>
+        GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/user/me/decks?page=1&size=100", (json) =>
         {
             DeckListResponse wrapper = JsonUtility.FromJson<DeckListResponse>(json);
             cachedDeckPresets = wrapper.data.items;
@@ -93,5 +93,10 @@ public class DeckService
     public List<OpponentDeck> GetOpponentDeckList()
     {
         return opponentDeckList;
+    }
+
+    public void ClearDeckCache()
+    {
+        cachedDeckPresets = null;
     }
 }

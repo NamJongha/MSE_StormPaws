@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 //njh
 public class LogInGoogle : MonoBehaviour
 {
-    private string clientId = "";
+    private string clientId = "545083093858-ihct97o56rq64mpuv9j3fns0tdlcdan7.apps.googleusercontent.com";
     private string redirectUri = "http://localhost:5000/";
 
     public void signInWithGoogle()

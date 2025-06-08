@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 6506707153532812842}
   - component: {fileID: 4488644325195023750}
   m_Layer: 5
-  m_Name: DeckSlotItem 3
+  m_Name: SelectDeckSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -54,7 +54,7 @@ public class DeckManager : MonoBehaviour
             {
                 ui.SetDeck(i, deck);
                 string deckId = deck.id;
-                ui.deleteButton.onClick.RemoveAllListeners();
+                //ui.deleteButton.onClick.RemoveAllListeners();
                 //ui.deleteButton.onClick.AddListener(() => DeleteDeck(deckId));
 
                 if (deckDisplay != null)
@@ -117,7 +117,7 @@ public class DeckManager : MonoBehaviour
 
             if (label != null)
             {
-                label.text = card.name;
+                label.text = LanguageTranslate.GetDisplayName(card.name);
             }
 
             Image img = btn.transform.Find("AnimalImage")?.GetComponent<Image>();
@@ -173,7 +173,7 @@ public class DeckManager : MonoBehaviour
         {
             if (i < selectedCards.Count)
             {
-                previewSlots[i].nameText.text = selectedCards[i].name;
+                previewSlots[i].nameText.text = LanguageTranslate.GetDisplayName(selectedCards[i].name);
                 previewSlots[i].icon.sprite = GameManager.Instance.SpriteLoader.Load(selectedCards[i].name);
                 previewSlots[i].icon.gameObject.SetActive(true);
             }
@@ -194,8 +194,6 @@ public class DeckManager : MonoBehaviour
             Debug.Log("Select 5 animals");
             return;
         }
-
-        createDeckPanel.SetActive(false);
 
         CreateDeck();
         selectedCards.Clear();
@@ -241,10 +239,19 @@ public class DeckManager : MonoBehaviour
 
         yield return request.SendWebRequest();
 
+
         if (request.result == UnityWebRequest.Result.Success)
         {
             Debug.Log("Success");
-            GameManager.Instance.DeckService.FetchDeckPresets(DisplayDeckList);
+
+            GameManager.Instance.DeckService.ClearDeckCache();
+
+            GameManager.Instance.DeckService.FetchDeckPresets(decks =>
+            {
+                DisplayDeckList(decks);
+            });
+
+            createDeckPanel.SetActive(false);
         }
         else
         {

@@ -13,7 +13,9 @@ public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerE
     private void Start()
     {
         if (tooltipPanel != null)
+        {
             tooltipPanel.SetActive(false);
+        }
     }
 
     public void SetCard(Card cardData)
@@ -23,7 +25,10 @@ public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (tooltipPanel == null || tooltipText == null) return;
+        if (tooltipPanel == null || tooltipText == null)
+        {
+            return;
+        }
 
         tooltipPanel.SetActive(true);
         ShowTooltip();
@@ -32,7 +37,9 @@ public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerE
     public void OnPointerExit(PointerEventData eventData)
     {
         if (tooltipPanel != null)
+        {
             tooltipPanel.SetActive(false);
+        }
     }
 
     private void ShowTooltip()
@@ -49,9 +56,9 @@ public class AnimalHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerE
     private string GetTooltipText(Card c)
     {
         return
-            $"Name: {c.name}\n" +
+            $"Name: {LanguageTranslate.GetDisplayName(c.name)}\n" +
             $"HP: {c.health}\n" +
             $"Attack: {c.attackPower}\n" +
-            $"Type: {c.cardType}";
+            $"Type: {LanguageTranslate.GetCardType(c.cardType)}";
     }
 }

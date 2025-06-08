@@ -54,7 +54,7 @@ public class AISimulationManager : MonoBehaviour
 
             List<string> weatherOptions = new(data.weatherProbabilities.Keys);
 
-            builder.AppendLine("🌤 Today's Weather Probability:");
+            builder.AppendLine("Today's Weather Probability:");
             foreach (var entry in data.weatherProbabilities)
             {
                 builder.AppendLine($"- {entry.Key}: {entry.Value}%");
@@ -115,27 +115,39 @@ public class AISimulationManager : MonoBehaviour
         for (int i = 0; i < myDecks.Count; i++)
         {
             var slot = Instantiate(myDeckSlotPrefab, myDeckSlotParent);
-            var ui = slot.GetComponent<OpponentDeckSlotUI>();
+            var ui = slot.GetComponent<DeckSlotUI>();
 
-            var fakeOpponentDeck = new OpponentDeck
-            {
-                id = myDecks[i].id,
-                decklist = myDecks[i].decklist,
-                user = new OpponentDeck.User { name = myDecks[i].deckName }
-            };
-
-            ui.SetDeck(fakeOpponentDeck, i);
+            ui.SetDeck(i, myDecks[i]);
             int captured = i;
+
+            ui.selectButton.onClick.RemoveAllListeners();
             ui.selectButton.onClick.AddListener(() => {
                 selectedMyDeck = myDecks[captured];
 
                 if (currentMyDeckHighlight != null)
                 {
-                    currentMyDeckHighlight.GetComponent<Image>().color = Color.white;
+                    var prevPanel = currentMyDeckHighlight.transform.Find("Panel");
+                    if (prevPanel != null)
+                    {
+                        var img = prevPanel.GetComponent<Image>();
+                        if (img != null)
+                        {
+                            img.color = Color.white;
+                        }
+                    }
                 }
 
                 currentMyDeckHighlight = slot;
-                currentMyDeckHighlight.GetComponent<Image>().color = Color.yellow;
+
+                var newPanel = currentMyDeckHighlight.transform.Find("Panel");
+                if (newPanel != null)
+                {
+                    var img = newPanel.GetComponent<Image>();
+                    if (img != null)
+                    {
+                        img.color = Color.yellow;
+                    }
+                }
             });
         }
     }
@@ -153,19 +165,39 @@ public class AISimulationManager : MonoBehaviour
             var ui = slot.GetComponent<OpponentDeckSlotUI>();
             ui.SetDeck(aiDecks[i], i);
             int captured = i;
+
+            ui.selectButton.onClick.RemoveAllListeners();
             ui.selectButton.onClick.AddListener(() => {
                 selectedAIDeck = aiDecks[captured];
 
                 if (currentAIDeckHighlight != null)
                 {
-                    currentAIDeckHighlight.GetComponent<Image>().color = Color.white;
+                    var prevPanel = currentAIDeckHighlight.transform.Find("Panel");
+                    if (prevPanel != null)
+                    {
+                        var img = prevPanel.GetComponent<Image>();
+                        if (img != null)
+                        {
+                            img.color = Color.white;
+                        }
+                    }
                 }
 
                 currentAIDeckHighlight = slot;
-                currentAIDeckHighlight.GetComponent<Image>().color = Color.yellow;
+
+                var newPanel = currentAIDeckHighlight.transform.Find("Panel");
+                if (newPanel != null)
+                {
+                    var img = newPanel.GetComponent<Image>();
+                    if (img != null)
+                    {
+                        img.color = Color.red;
+                    }
+                }
             });
         }
     }
+
 
     void RunSimulation()
     {

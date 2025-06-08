@@ -25,7 +25,7 @@ public class DeckSlotUI : MonoBehaviour
             {
                 var cardData = deck.decklist[i].card;
 
-                animalNames[i].text = cardData.name;
+                animalNames[i].text = LanguageTranslate.GetDisplayName(cardData.name);
                 animalImages[i].sprite = spriteLoader.Load(cardData.name);
                 animalImages[i].color = Color.white;
                 animalImages[i].gameObject.SetActive(true);
