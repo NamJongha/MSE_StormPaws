@@ -516,6 +516,13 @@ PlayerSettings:
       m_Height: 720
       m_Kind: 1
       m_SubKind: 
+  - m_BuildTarget: VisionOS
+    m_Icons:
+    - m_Textures: []
+      m_Width: 1024
+      m_Height: 1024
+      m_Kind: 0
+      m_SubKind: 
   m_BuildTargetBatching: []
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs: []
@@ -920,11 +927,6 @@ PlayerSettings:
   qualitySettingsNames: []
   projectName: StormPaws 2025-04-08_13-33-37
   organizationId: sirah31
-  cloudProjectId: 6d53dc07-dc0e-416f-9232-f8c10629d0ea
-  framebufferDepthMemorylessMode: 0
-  qualitySettingsNames: []
-  projectName: Stormpaws_final
-  organizationId: plazanimo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

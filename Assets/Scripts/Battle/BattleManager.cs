@@ -11,6 +11,7 @@ public class BattleManager : MonoBehaviour
     public Transform backgroundContainer;
     public TMP_Text weatherText;
     public TMP_Text cityText;
+    public GameObject introGroup;
 
     public Material fogSkybox;
     public Material rainySkybox;
@@ -22,6 +23,9 @@ public class BattleManager : MonoBehaviour
     private Dictionary<string, GameObject> backgroundMap = new();
     private GameObject currentBackground;
 
+    public GameObject playerDamage;
+    public GameObject opponentDamage;
+
     private void Awake()
     {
         foreach (Transform child in backgroundContainer)
@@ -31,37 +35,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    /*private void Start()
-    {
-        bool isAISimulation = PlayerPrefs.GetInt("IsAISimulation", 0) == 1;
-
-        if (isAISimulation)
-        {
-            string weather = PlayerPrefs.GetString("SimulatedWeather", "CLEAR").ToUpper();
-
-            BattleEnvData env = new BattleEnvData { weatherType = weather, city = "Simulation" };
-            OnEnvironmentReceived(env);
-
-            GameManager.Instance.StartCoroutine(GameManager.Instance.BattleService.PlayAISimulation());
-        }
-        else
-        {
-            Debug.Log("fetch weather");
-            StartCoroutine(GameManager.Instance.BattleService.FetchBattleEnvironment(
-                (env) =>
-                {
-                    env.weatherType = env.weatherType?.ToUpper();
-                    OnEnvironmentReceived(env);
-
-                },
-                (error) => { Debug.LogError("Fail: " + error); }
-            ));
-        }
-    }*/
-
     private void Start()
     {
         bool isAISimulation = PlayerPrefs.GetInt("IsAISimulation", 0) == 1;
+
+        GameManager.Instance.BattleService.SetDamageTextObjects(playerDamage, opponentDamage);
 
         if (isAISimulation)
         {
@@ -105,6 +83,13 @@ public class BattleManager : MonoBehaviour
         {
             fetchedEnv.weatherType = fetchedEnv.weatherType?.ToUpper();
             OnEnvironmentReceived(fetchedEnv);
+
+            weatherText.text = fetchedEnv.weatherType;
+            cityText.text = fetchedEnv.city;
+
+            introGroup.SetActive(true);
+            yield return new WaitForSeconds(2.5f);
+            introGroup.SetActive(false);
         }
 
         yield return GameManager.Instance.StartCoroutine(
@@ -122,6 +107,9 @@ public class BattleManager : MonoBehaviour
         string weatherKey = env.weatherType.ToUpper();
         weatherText.text = weatherKey;
         cityText.text = env.city;
+
+        Debug.Log($"Set Weather: {weatherKey}");
+        Debug.Log($"Background Found: {backgroundMap.ContainsKey(weatherKey)}");
 
         if (backgroundMap.TryGetValue(weatherKey, out var bg))
         {

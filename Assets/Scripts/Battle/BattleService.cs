@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using static UnityEngine.GraphicsBuffer;
 
 /// <summary>
 /// Battle System Script
@@ -47,7 +48,7 @@ public class BattleService
         playerCharacters = new List<GameObject>();
         opponentCharacters = new List<GameObject>();
 
-        playerDeckId = PlayerPrefs.GetString("SelectedPlayerDeckId", "");
+        playerDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
         opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
     }
 
@@ -143,10 +144,10 @@ public class BattleService
             }
 
             float elapsed = Time.time - startTime;
-            float waitTime = log.timestamp - elapsed;
+            float waitTime = (log.timestamp - elapsed) * 2f;
 
-            if (waitTime > 0f)
-                yield return new WaitForSeconds(waitTime);
+            waitTime = Mathf.Max(waitTime, 0.8f);
+            yield return new WaitForSeconds(waitTime);
 
             TriggerAttack(log.attackerDeckId, log.damage, log.targetRemainingHp);
         }
@@ -162,18 +163,36 @@ public class BattleService
      * -> This is for preventing that when each character is same, the Id is also same,
      * so the character will attack and hit twice at a time if it checks only character id.
      */
+
+    //LJH: adding battle log
     private void TriggerAttack(string actorDeckId, int damage, int remainingHp)
     {
         if (actorDeckId == playerDeckId)
         {
+            if (remainingHp <= 0)
+            {
+                BattleUIHelper.Instance.Log("Opponent's No." + (opponentCharacterIndex + 1) + " character has fallen!");
+            }
+        }
+        else
+        {
+            if (remainingHp <= 0)
+            {
+                BattleUIHelper.Instance.Log("Your No." + (playerCharacterIndex + 1) + " character has fallen!");
+            }
+        }
+
+        if (actorDeckId == playerDeckId)
+        {
             Debug.Log("player attack" + damage);
             //playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            //GameManager.Instance.StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
+            GameManager.Instance.StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
 
             if (remainingHp <= 0)
             {
                 Debug.Log("character dead");
-                opponentCharacters[opponentCharacterIndex].SetActive(false); // not working
+                opponentCharacters[opponentCharacterIndex].SetActive(false);
+
                 if (opponentCharacterIndex < 5)//if character is still left
                 {
                     opponentCharacterIndex += 1;
@@ -190,11 +209,12 @@ public class BattleService
         {
             Debug.Log("opponent attack" + damage);
             //opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            //GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
+            GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
             if (remainingHp <= 0)
             {
                 Debug.Log("character dead");
                 playerCharacters[playerCharacterIndex].SetActive(false);
+
                 if (playerCharacterIndex < 5)
                 {
                     playerCharacterIndex += 1;
@@ -213,20 +233,26 @@ public class BattleService
         // Effect addable below here
     }
 
+    public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
+    {
+        playerDamage = playerText;
+        opponentDamage = opponentText;
+    }
+
     private IEnumerator ShowDamage(GameObject target, int damage, string player)
     {
         if (player == "player")
         {
-            playerDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
-            playerDamage.GetComponent<TMP_Text>().text = damage.ToString();
+            //playerDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
+            playerDamage.GetComponent<TMP_Text>().text = "-" + damage.ToString();
             playerDamage.SetActive(true);
             yield return new WaitForSeconds(2f);
             playerDamage.SetActive(false);
         }
         else
         {
-            opponentDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
-            opponentDamage.GetComponent<TMP_Text>().text = damage.ToString();
+            //opponentDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
+            opponentDamage.GetComponent<TMP_Text>().text =  "-" + damage.ToString();
             opponentDamage.SetActive(true);
             yield return new WaitForSeconds(2f);
             opponentDamage.SetActive(false);

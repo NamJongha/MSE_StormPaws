@@ -17,6 +17,9 @@ public class SceneNavigator : MonoBehaviour
     // Method for moving to Opponent
     public void GoToOpponentSelect()
     {
+        PlayerPrefs.SetInt("IsAISimulation", 0);
+        PlayerPrefs.Save();
+
         SceneManager.LoadScene("Opponent");
         Debug.Log("Try to move to Opponent..."); // Debugging Log
     }
@@ -43,6 +46,9 @@ public class SceneNavigator : MonoBehaviour
 
     public void GoToAIOpponent()
     {
+        PlayerPrefs.SetInt("IsAISimulation", 1);
+        PlayerPrefs.Save();
+
         SceneManager.LoadScene("AISelect");
     }
 }

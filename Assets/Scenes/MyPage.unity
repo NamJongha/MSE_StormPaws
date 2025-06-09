@@ -5609,7 +5609,7 @@ MonoBehaviour:
   animalButtonPrefab: {fileID: 2660360997199180310, guid: aaafca5ef69c97c4d98a4a6ade39d9fb, type: 3}
   animalButtonContainer: {fileID: 984747874}
   deckSlotContainer: {fileID: 1377262844}
-  deckSlotPrefab: {fileID: 3301376321743224490, guid: dcafa66b8a71e134f8209d93eecfa629, type: 3}
+  deckSlotPrefab: {fileID: 3301376321743224490, guid: 31fc84a9cfaff504aac8d9cd6d204736, type: 3}
   deckDisplay: {fileID: 0}
   click: {fileID: 1386371107}
 --- !u!114 &1386371111

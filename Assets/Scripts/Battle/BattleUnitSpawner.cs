@@ -49,8 +49,8 @@ public class BattleUnitSpawner : MonoBehaviour
                 if (prefab != null)
                 {
                     Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
-                    Instantiate(prefab, mySpawnPoints[i].position, rotation);
-                    GameManager.Instance.BattleService.SetMyDeck(prefab);
+                    GameObject unit = Instantiate(prefab, mySpawnPoints[i].position, rotation);
+                    GameManager.Instance.BattleService.SetMyDeck(unit);
                 }
                 else
                 {
@@ -74,8 +74,8 @@ public class BattleUnitSpawner : MonoBehaviour
                 if (prefab != null)
                 {
                     Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
-                    Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
-                    GameManager.Instance.BattleService.SetOpponentDeck(prefab);
+                    GameObject unit = Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
+                    GameManager.Instance.BattleService.SetOpponentDeck(unit);
                 }
                 else
                 {
