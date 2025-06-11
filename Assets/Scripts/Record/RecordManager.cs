@@ -33,19 +33,14 @@ public class RecordManager : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("RecordManager Start() 호출됨");
-
         GameManager.Instance.BattleService.FetchBattleRecords((records) =>
         {
-            Debug.Log($"서버에서 전투 기록 {records.Count}개 받아옴");
             DisplayBattleRecords(records);
         });
     }
 
     public void DisplayBattleRecords(List<BattleRecord> records)
     {
-        Debug.Log("DisplayBattleRecords 호출됨: " + records.Count + "개");
-
         foreach (Transform child in battleRecordContainer)
         {
             Destroy(child.gameObject);
@@ -59,7 +54,6 @@ public class RecordManager : MonoBehaviour
 
             ui.numberText.text = (i + 1).ToString();
             ui.opponentText.text = record.opponent;
-            Debug.Log("Opponent Name in record: " + record.opponent);
             ui.weatherText.text = record.weather;
             ui.resultText.text = record.result;
 

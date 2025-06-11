@@ -276,8 +276,6 @@ public class BattleService
 
         GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest(url, (json) =>
         {
-            Debug.Log("BattleRecord 응답 수신: " + json);
-
             BattleRecordResponse response = JsonUtility.FromJson<BattleRecordResponse>(json);
             if (response != null && response.data != null && response.data.items != null)
             {
@@ -300,13 +298,12 @@ public class BattleService
             }
             else
             {
-                Debug.LogWarning("전투기록 파싱 실패 또는 items 없음");
                 callback?.Invoke(new List<BattleRecord>());
             }
         },
         (error) =>
         {
-            Debug.LogError("전투기록 가져오기 실패: " + error);
+            Debug.LogError("Battle Record Load Fail: " + error);
         }));
     }
 
