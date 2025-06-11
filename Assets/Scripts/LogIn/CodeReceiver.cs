@@ -26,7 +26,7 @@ public class CodeReceiver : MonoBehaviour
         if (receivedCodes.Count > 0)
         {
             string code = receivedCodes.Dequeue();
-            Debug.Log("Main thread received code: " + code);
+            //Debug.Log("Main thread received code: " + code);
             StartCoroutine(SendCodeCoroutine(code));
         }
     }
@@ -38,7 +38,7 @@ public class CodeReceiver : MonoBehaviour
         httpListener = new HttpListener();
         httpListener.Prefixes.Add(RedirectUri);
         httpListener.Start();
-        Debug.Log("OAuth Redirect Server started.");
+        //Debug.Log("OAuth Redirect Server started.");
         Task.Run(() => WaitForRequest());
     }
 
@@ -63,7 +63,7 @@ public class CodeReceiver : MonoBehaviour
             }
         }
 
-        Debug.Log("Received OAuth Code (in background thread): " + code);
+        //Debug.Log("Received OAuth Code (in background thread): " + code);
 
         var response = context.Response;
         string responseString = "<html><body>Login successful! You can close this window.</body></html>";
@@ -94,14 +94,14 @@ public class CodeReceiver : MonoBehaviour
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        Debug.Log(json);
+        //Debug.Log(json);
 
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Backend login success!");
-            Debug.Log(request.downloadHandler.text);
+            //Debug.Log("Backend login success!");
+            //Debug.Log(request.downloadHandler.text);
 
             string jsonResponse = request.downloadHandler.text;
             ResponseFromServer responseFromServer = JsonUtility.FromJson<ResponseFromServer>(jsonResponse);
@@ -109,8 +109,8 @@ public class CodeReceiver : MonoBehaviour
             string accessToken = responseFromServer.data.accessToken; //DTO class is declared in Token Manager Script
             string refreshToken = responseFromServer.data.refreshToken;
 
-            Debug.Log("access: " + accessToken);
-            Debug.Log("refresh: " + refreshToken);
+            //Debug.Log("access: " + accessToken);
+            //Debug.Log("refresh: " + refreshToken);
 
             TokenManager.SaveToken(accessToken, refreshToken);
         }

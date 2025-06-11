@@ -17,7 +17,9 @@ public class SpriteLoader
 
     public GameObject LoadAnimalPrefab(string cardName)
     {
+        //Debug.Log("cardname:" + cardName);
         string resourceKey = LanguageTranslate.GetResourceKey(cardName);
+        //Debug.Log("resource key:" + resourceKey);
         GameObject prefab = Resources.Load<GameObject>($"Animals/{resourceKey}");
 
         if (prefab == null)

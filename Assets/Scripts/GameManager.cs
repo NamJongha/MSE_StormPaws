@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviour
                 PersonalInfoWrapper wrapper = JsonUtility.FromJson<PersonalInfoWrapper>(json);
                 string playerId = wrapper.data.id;
                 PlayerPrefs.SetString("PlayerId", playerId);
-                Debug.Log(playerId + "saved successfully");
             }));
     }
 

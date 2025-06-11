@@ -96,7 +96,7 @@ public class BattleService
         };
 
         string jsonData = JsonUtility.ToJson(requestData);
-        Debug.Log(jsonData);
+        //Debug.Log(jsonData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
         string url = $"{GameManager.Instance.baseUrl}/battles/pvp";
@@ -111,7 +111,8 @@ public class BattleService
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Successfully fetched simulation");
+            //Debug.Log("Successfully fetched simulation");
+
             //change result json into meaningful data
             string json = request.downloadHandler.text;
             BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
@@ -128,8 +129,8 @@ public class BattleService
     //check the timestamp in log and do acutal attack according to the log /njh
     private IEnumerator PlayBattleSimulation(List<BattleLog> logs)
     {
-        Debug.Log("Start Battle");
-        Debug.Log(isBattleOver);
+        //Debug.Log("Start Battle");
+        //Debug.Log(isBattleOver);
         float startTime = Time.time;
         foreach (var log in logs)
         {

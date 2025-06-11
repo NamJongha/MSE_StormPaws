@@ -69,7 +69,6 @@ public class DeckService
         PlayerPrefs.SetString("SelectedOpponentDeckId", deck.id);
         PlayerPrefs.SetString("SelectedOpponentUserId", deck.user.id);
 
-        Debug.Log("oppo" + selectedOpponentUserId);
         PlayerPrefs.Save();
     }
 

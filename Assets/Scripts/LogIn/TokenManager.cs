@@ -28,7 +28,7 @@ public class TokenManager : MonoBehaviour
         PlayerPrefs.SetString("refreshToken", refreshToken);
         PlayerPrefs.Save();
         hasToken = true;
-        Debug.Log("token saved successfully");
+        //Debug.Log("token saved successfully");
     }
 
     public static (string accessToken, string refreshToken) LoadTokens()
