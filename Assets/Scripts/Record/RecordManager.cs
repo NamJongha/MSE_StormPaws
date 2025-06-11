@@ -13,8 +13,6 @@ public class RecordManager : MonoBehaviour
     [Header("UI")]
     public GameObject battleRecordPrefab;
     public Transform battleRecordContainer;
-    public GameObject detailPanel;
-    public TMP_Text detailText;
 
     [System.Serializable]
     public class BattleDetailDTO
@@ -33,46 +31,21 @@ public class RecordManager : MonoBehaviour
         public int damage;
     }
 
-    public void ShowBattleDetail(string battleId)
+    private void Start()
     {
-        StartCoroutine(FetchBattleDetail(battleId));
-    }
+        Debug.Log("RecordManager Start() 호출됨");
 
-    private IEnumerator FetchBattleDetail(string battleId)
-    {
-        string url = $"{GameManager.Instance.baseUrl}/battle/detail/{battleId}";
-
-        UnityWebRequest req = UnityWebRequest.Get(url);
-        TokenManager.SendServerToken(req);
-        req.SetRequestHeader("Content-Type", "application/json");
-
-        yield return req.SendWebRequest();
-
-        if (req.result == UnityWebRequest.Result.Success)
+        GameManager.Instance.BattleService.FetchBattleRecords((records) =>
         {
-            BattleDetailDTO detail = JsonUtility.FromJson<BattleDetailDTO>(req.downloadHandler.text);
-            detailText.text = FormatBattleDetail(detail);
-            detailPanel.SetActive(true);
-        }
-        else
-        {
-            Debug.LogError("Fail: " + req.error);
-        }
-    }
-
-    // for Detail Screen
-    private string FormatBattleDetail(BattleDetailDTO detail)
-    {
-        string formatted = $"Battle ID: {detail.battleId}\nDate: {detail.date}\nResult: {detail.result}\n\n[Round]\n";
-        foreach (var round in detail.rounds)
-        {
-            formatted += $" - {round.round}R: {round.action} (Damage: {round.damage})\n";
-        }
-        return formatted;
+            Debug.Log($"서버에서 전투 기록 {records.Count}개 받아옴");
+            DisplayBattleRecords(records);
+        });
     }
 
     public void DisplayBattleRecords(List<BattleRecord> records)
     {
+        Debug.Log("DisplayBattleRecords 호출됨: " + records.Count + "개");
+
         foreach (Transform child in battleRecordContainer)
         {
             Destroy(child.gameObject);
@@ -86,6 +59,7 @@ public class RecordManager : MonoBehaviour
 
             ui.numberText.text = (i + 1).ToString();
             ui.opponentText.text = record.opponent;
+            Debug.Log("Opponent Name in record: " + record.opponent);
             ui.weatherText.text = record.weather;
             ui.resultText.text = record.result;
 
@@ -93,15 +67,13 @@ public class RecordManager : MonoBehaviour
 
             for (int j = 0; j < ui.myDeckSlots.Length; j++)
             {
-                if (j < myDeck.Length)
+                if (j < myDeck.Length && !string.IsNullOrWhiteSpace(myDeck[j]))
                 {
-                    string animalName = myDeck[j];
-                    ui.myDeckSlots[j].icon.sprite = GameManager.Instance.SpriteLoader.Load(animalName);
+                    string animalName = LanguageTranslate.GetDisplayName(myDeck[j].Trim());
+                    var sprite = GameManager.Instance.SpriteLoader.Load(animalName);
+
+                    ui.myDeckSlots[j].icon.sprite = sprite;
                     ui.myDeckSlots[j].icon.gameObject.SetActive(true);
-                }
-                else
-                {
-                    ui.myDeckSlots[j].icon.gameObject.SetActive(false);
                 }
             }
 
@@ -109,22 +81,17 @@ public class RecordManager : MonoBehaviour
 
             for (int j = 0; j < ui.opponentSlots.Length; j++)
             {
-                if (j < opponentDeck.Length)
+                if (j < opponentDeck.Length && !string.IsNullOrWhiteSpace(opponentDeck[j]))
                 {
-                    string animalName = opponentDeck[j];
-                    ui.myDeckSlots[j].icon.sprite = GameManager.Instance.SpriteLoader.Load(animalName);
-                    ui.opponentSlots[j].icon.gameObject.SetActive(true);
-                }
-                else
-                {
-                    ui.opponentSlots[j].icon.gameObject.SetActive(false);
+                    string animalName = LanguageTranslate.GetDisplayName(opponentDeck[j].Trim());
+                    var sprite = GameManager.Instance.SpriteLoader.Load(animalName);
+
+                    ui.opponentSlots[j].icon.sprite = sprite;
+                    ui.opponentSlots[j].icon.gameObject.SetActive(sprite);
                 }
             }
 
-
             string capturedBattleId = record.battleId;
-            ui.detailsButton.onClick.RemoveAllListeners();
-            ui.detailsButton.onClick.AddListener(() => ShowBattleDetail(capturedBattleId));
         }
     }
 }

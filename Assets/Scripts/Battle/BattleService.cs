@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using static UnityEngine.GraphicsBuffer;
+using System.Linq;
 
 /// <summary>
 /// Battle System Script
@@ -272,10 +272,41 @@ public class BattleService
 
     public void FetchBattleRecords(Action<List<BattleRecord>> callback)
     {
-        GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/battle/logs", (json) =>
+        string url = $"{GameManager.Instance.baseUrl}/battles/records/me";
+
+        GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest(url, (json) =>
         {
-            BattleRecordListWrapper wrapper = JsonUtility.FromJson<BattleRecordListWrapper>(json);
-            callback?.Invoke(wrapper.data);
+            Debug.Log("BattleRecord 응답 수신: " + json);
+
+            BattleRecordResponse response = JsonUtility.FromJson<BattleRecordResponse>(json);
+            if (response != null && response.data != null && response.data.items != null)
+            {
+                List<BattleRecord> battleRecords = new();
+
+                foreach (var item in response.data.items)
+                {
+                    battleRecords.Add(new BattleRecord
+                    {
+                        battleId = item.myDeck?.id ?? "(no id)",
+                        weather = item.weather,
+                        result = item.result,
+                        opponent = item.opponentDeck?.user?.name ?? "(unknown)",
+                        myDeck = string.Join(",", item.myDeck?.decklist?.Select(x => x.card.name) ?? new List<string>()),
+                        opponentDeck = string.Join(",", item.opponentDeck?.decklist?.Select(x => x.card.name) ?? new List<string>())
+                    });
+                }
+
+                callback?.Invoke(battleRecords);
+            }
+            else
+            {
+                Debug.LogWarning("전투기록 파싱 실패 또는 items 없음");
+                callback?.Invoke(new List<BattleRecord>());
+            }
+        },
+        (error) =>
+        {
+            Debug.LogError("전투기록 가져오기 실패: " + error);
         }));
     }
 
@@ -355,13 +386,17 @@ public class BattleLog
     public int targetRemainingHp;
 }
 
-
 [System.Serializable]
-public class BattleRecordListWrapper
+public class BattleRecordResponse
 {
-    public List<BattleRecord> data;
+    public BattleRecordData data;
 }
 
+[System.Serializable]
+public class BattleRecordData
+{
+    public List<BattleRecordItem> items;
+}
 [System.Serializable]
 public class BattleRequestDto
 {

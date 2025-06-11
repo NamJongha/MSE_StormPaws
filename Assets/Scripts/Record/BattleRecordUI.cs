@@ -16,6 +16,4 @@ public class BattleRecordUI : MonoBehaviour
 
     public AnimalSlotUI[] opponentSlots;
     public AnimalSlotUI[] myDeckSlots;
-
-    public Button detailsButton;
 }
