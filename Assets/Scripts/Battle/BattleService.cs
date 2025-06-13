@@ -38,6 +38,14 @@ public class BattleService
     private bool isBattleOver = false;
     private string weatherId;
 
+    private string winnerId;
+    private BattleEnvData weatherData;
+    private float battleTime;
+
+    private GameObject resultUI;
+
+    private BattleResultUI battleResultUI;
+
     private Dictionary<GameObject, (HPBar bar, int currentHp, int maxHp)> hpBars = new();
     private const int defaultMaxHp = 100;
     private HPBar currentPlayerHPBar;
@@ -73,6 +81,7 @@ public class BattleService
             if (response != null)
             {
                 weatherId = response.data.id;
+                weatherData = response.data;
                 onSuccess?.Invoke(response.data);
             }
         }
@@ -132,11 +141,13 @@ public class BattleService
     //check the timestamp in log and do acutal attack according to the log /njh
     private IEnumerator PlayBattleSimulation(List<BattleLog> logs)
     {
-        //Debug.Log("Start Battle");
-        //Debug.Log(isBattleOver);
         float startTime = Time.time;
         foreach (var log in logs)
         {
+            Debug.Log($"[PlayBattleSimulation] Processing log at timestamp: {log.timestamp}");
+            Debug.Log($"Attacker: {log.attackerDeckId}, AttackerCard: {log.attackerCardId}, Damage: {log.damage}, TargetRemainingHP: {log.targetRemainingHp}");
+            Debug.Log($"Current Player Index: {playerCharacterIndex}, Opponent Index: {opponentCharacterIndex}");
+
             //stop coroutine if the battle is over
             if (isBattleOver == true)
             {
@@ -154,6 +165,7 @@ public class BattleService
             yield return new WaitForSeconds(waitTime);
 
             TriggerAttack(log.attackerDeckId, log.damage, log.targetRemainingHp);
+            battleTime = elapsed;
         }
     }
 
@@ -200,6 +212,7 @@ public class BattleService
                 {
                     Debug.Log("Battle Ended");
                     isBattleOver = true;
+                    GameManager.Instance.StartCoroutine(ShowResult());
                 }
             }
         }
@@ -231,15 +244,43 @@ public class BattleService
                 {
                     Debug.Log("Battle Ended");
                     isBattleOver = true;
+                    GameManager.Instance.StartCoroutine(ShowResult());
                 }
             }
         }
     }
 
-    public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
+    
+
+    private IEnumerator ShowResult()
     {
-        playerDamage = playerText;
-        opponentDamage = opponentText;
+        yield return new WaitForSeconds(2f);
+        BattleResult result = new();
+
+        result.result = (winnerId == playerDeckId) ? "WIN" : "LOSE";
+        result.weather = weatherData.weatherType;
+        result.city = weatherData.city;
+        result.timestamp = battleTime.ToString();
+
+        bool isMyDeckLoaded = false;
+        bool isOpponentDeckLoaded = false;
+
+        GameManager.Instance.DeckService.FetchDeckById(playerDeckId, DeckPreset =>
+        {
+            result.myDeckList = DeckPreset.decklist;
+            isMyDeckLoaded = true;
+        });
+
+        GameManager.Instance.DeckService.FetchDeckById(opponentDeckId, DeckPreset =>
+        {
+            result.opponentDeckList = DeckPreset.decklist;
+            isOpponentDeckLoaded = true;
+        });
+
+        yield return new WaitUntil(() => isMyDeckLoaded && isOpponentDeckLoaded);
+
+        battleResultUI.SetUI(result);
+        resultUI.SetActive(true);
     }
 
     private IEnumerator ShowDamage(GameObject target, int damage, string player)
@@ -305,6 +346,22 @@ public class BattleService
                 currentOpponentHPBar.gameObject.SetActive(true);
             }
         }
+    }
+    
+    public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
+    {
+        playerDamage = playerText;
+        opponentDamage = opponentText;
+    }
+
+    public void SetResultUI(GameObject o)
+    {
+        resultUI = o;
+    }
+
+    public void SetRecordManager(BattleResultUI ui)
+    {
+        battleResultUI = ui;
     }
 
 

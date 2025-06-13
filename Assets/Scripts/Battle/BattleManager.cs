@@ -26,6 +26,24 @@ public class BattleManager : MonoBehaviour
     public GameObject playerDamage;
     public GameObject opponentDamage;
 
+    [SerializeField]
+    private GameObject resultUi, recordManager;
+
+    private Dictionary<string, string> weatherMap = new()
+    {
+        {"CLEAR", "00000000-0000-0000-0000-000000000001"},
+        {"CLOUDS", "00000000-0000-0000-0000-000000000002"},
+        {"RAIN", "00000000-0000-0000-0000-000000000003"},
+        {"SNOW", "00000000-0000-0000-0000-000000000004"},
+        {"FOG", "00000000-0000-0000-0000-000000000005"},
+        {"MIST", "00000000-0000-0000-0000-000000000006"},
+        {"THUNDERSTORM", "00000000-0000-0000-0000-000000000007"},
+        {"DUST", "00000000-0000-0000-0000-000000000008"},
+        {"TORNADO", "00000000-0000-0000-0000-000000000009"},
+        {"GUST", "00000000-0000-0000-0000-000000000010"},
+        {"UNKNOWN", "00000000-0000-0000-0000-000000000011"},
+    };
+
     private void Awake()
     {
         foreach (Transform child in backgroundContainer)
@@ -37,9 +55,11 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        bool isAISimulation = PlayerPrefs.GetInt("IsAISimulation", 0) == 1;
-
         GameManager.Instance.BattleService.SetDamageTextObjects(playerDamage, opponentDamage);
+        GameManager.Instance.BattleService.SetResultUI(resultUi);
+        GameManager.Instance.BattleService.SetRecordManager(recordManager.GetComponent<BattleResultUI>());
+
+        bool isAISimulation = PlayerPrefs.GetInt("IsAISimulation", 0) == 1;
 
         if (isAISimulation)
         {
@@ -48,7 +68,7 @@ public class BattleManager : MonoBehaviour
             BattleEnvData env = new BattleEnvData { weatherType = weather, city = "Simulation" };
             OnEnvironmentReceived(env);
 
-            StartCoroutine(GameManager.Instance.BattleService.PlayAISimulation());
+            StartCoroutine(GameManager.Instance.BattleService.FetchBattleSimulationLog());
         }
         else
         {

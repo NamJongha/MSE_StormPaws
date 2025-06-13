@@ -27,7 +27,7 @@ public class BattleResultUI : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(FetchBattleResult());
+        //StartCoroutine(FetchBattleResult());
     }
 
     private IEnumerator FetchBattleResult()
@@ -56,7 +56,7 @@ public class BattleResultUI : MonoBehaviour
         }
     }
 
-    private void SetUI(BattleResult result)
+    public void SetUI(BattleResult result)
     {
         resultText.text = result.result == "WIN" ? "WIN!" : "Lose...";
         weatherText.text = $"Weather: {result.weather}";
@@ -77,6 +77,8 @@ public class BattleResultUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        int xValueOffset = -300;
+
         foreach (DeckCard deckCard in deckList)
         {
             GameObject slot = Instantiate(cardPreviewSlotPrefab, container);
@@ -85,6 +87,9 @@ public class BattleResultUI : MonoBehaviour
 
             string cardName = deckCard.card.name;
             icon.sprite = GameManager.Instance.SpriteLoader.Load(cardName);
+            slot.GetComponent<RectTransform>().position = container.GetComponent<RectTransform>().position + new Vector3(xValueOffset, 0, 0);
+            slot.transform.localScale = new Vector3(3, 3, 3);
+            xValueOffset += 150;
             name.text = cardName;
         }
     }
