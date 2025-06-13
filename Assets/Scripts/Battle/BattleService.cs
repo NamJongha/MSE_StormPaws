@@ -38,6 +38,14 @@ public class BattleService
     private bool isBattleOver = false;
     private string weatherId;
 
+    private string winnerId;
+    private BattleEnvData weatherData;
+    private float battleTime;
+
+    private GameObject resultUI;
+
+    private BattleResultUI battleResultUI;
+
     public void ResetState()
     {
         playerCharacterIndex = 0;
@@ -50,6 +58,10 @@ public class BattleService
 
         playerDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
         opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
+
+        winnerId = "";
+        weatherData = null;
+        battleTime = 0;
     }
 
     public IEnumerator FetchBattleEnvironment(Action<BattleEnvData> onSuccess, Action<string> onError)
@@ -68,6 +80,7 @@ public class BattleService
             if (response != null)
             {
                 weatherId = response.data.id;
+                weatherData = response.data;
                 onSuccess?.Invoke(response.data);
             }
         }
@@ -91,12 +104,10 @@ public class BattleService
             defenderDeckId = opponentDeckId,
             defenderUserId = opponentId,
             weatherLogId = weatherId,
-
-
         };
 
         string jsonData = JsonUtility.ToJson(requestData);
-        //Debug.Log(jsonData);
+        Debug.Log("data send to server: " + jsonData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
         string url = $"{GameManager.Instance.baseUrl}/battles/pvp";
@@ -116,6 +127,12 @@ public class BattleService
             //change result json into meaningful data
             string json = request.downloadHandler.text;
             BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
+            winnerId = battleSimulation.data.winnerId;
+            Debug.Log("Log from server: " + json);
+
+            Debug.Log("before play player count" + playerCharacters.Count);
+            Debug.Log("before play opponent count" + opponentCharacters.Count);
+
             GameManager.Instance.StartCoroutine(PlayBattleSimulation(battleSimulation.data.logs));
         }
         else
@@ -129,11 +146,13 @@ public class BattleService
     //check the timestamp in log and do acutal attack according to the log /njh
     private IEnumerator PlayBattleSimulation(List<BattleLog> logs)
     {
-        //Debug.Log("Start Battle");
-        //Debug.Log(isBattleOver);
         float startTime = Time.time;
         foreach (var log in logs)
         {
+            Debug.Log($"[PlayBattleSimulation] Processing log at timestamp: {log.timestamp}");
+            Debug.Log($"Attacker: {log.attackerDeckId}, AttackerCard: {log.attackerCardId}, Damage: {log.damage}, TargetRemainingHP: {log.targetRemainingHp}");
+            Debug.Log($"Current Player Index: {playerCharacterIndex}, Opponent Index: {opponentCharacterIndex}");
+
             //stop coroutine if the battle is over
             if (isBattleOver == true)
             {
@@ -151,6 +170,7 @@ public class BattleService
             yield return new WaitForSeconds(waitTime);
 
             TriggerAttack(log.attackerDeckId, log.damage, log.targetRemainingHp);
+            battleTime = elapsed;
         }
     }
 
@@ -191,7 +211,7 @@ public class BattleService
 
             if (remainingHp <= 0)
             {
-                Debug.Log("character dead");
+                Debug.Log("opponent character dead");
                 opponentCharacters[opponentCharacterIndex].SetActive(false);
 
                 if (opponentCharacterIndex < 5)//if character is still left
@@ -202,6 +222,8 @@ public class BattleService
                         Debug.Log("Battle Ended");
                         //end battle
                         isBattleOver = true;
+                        GameManager.Instance.StartCoroutine(ShowResult());
+
                     }
                 }      
             }
@@ -213,7 +235,7 @@ public class BattleService
             GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
             if (remainingHp <= 0)
             {
-                Debug.Log("character dead");
+                Debug.Log("player character dead");
                 playerCharacters[playerCharacterIndex].SetActive(false);
 
                 if (playerCharacterIndex < 5)
@@ -225,19 +247,43 @@ public class BattleService
                             Debug.Log("Battle Ended");
                             //end battle
                             isBattleOver = true;
+                            GameManager.Instance.StartCoroutine(ShowResult());
                         }
                     }
                 }
             }
         }
-
-        // Effect addable below here
     }
 
-    public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
+    private IEnumerator ShowResult()
     {
-        playerDamage = playerText;
-        opponentDamage = opponentText;
+        yield return new WaitForSeconds(2f);
+        BattleResult result = new();
+
+        result.result = (winnerId == playerDeckId) ? "WIN" : "LOSE";
+        result.weather = weatherData.weatherType;
+        result.city = weatherData.city;
+        result.timestamp = battleTime.ToString();
+
+        bool isMyDeckLoaded = false;
+        bool isOpponentDeckLoaded = false;
+
+        GameManager.Instance.DeckService.FetchDeckById(playerDeckId, DeckPreset =>
+        {
+            result.myDeckList = DeckPreset.decklist;
+            isMyDeckLoaded = true;
+        });
+
+        GameManager.Instance.DeckService.FetchDeckById(opponentDeckId, DeckPreset =>
+        {
+            result.opponentDeckList = DeckPreset.decklist;
+            isOpponentDeckLoaded = true;
+        });
+
+        yield return new WaitUntil(() => isMyDeckLoaded && isOpponentDeckLoaded);
+
+        battleResultUI.SetUI(result);
+        resultUI.SetActive(true);
     }
 
     private IEnumerator ShowDamage(GameObject target, int damage, string player)
@@ -260,14 +306,34 @@ public class BattleService
         }
     }
 
+    public void SetResultUI(GameObject o)
+    {
+        resultUI = o;
+    }
+
+    public void SetRecordManager(BattleResultUI ui)
+    {
+        battleResultUI = ui;
+    }
+
+    public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
+    {
+        playerDamage = playerText;
+        opponentDamage = opponentText;
+    }
+
+    
+
     public void SetMyDeck(GameObject character)
     {
         playerCharacters.Add(character);
+        Debug.Log("player count" + playerCharacters.Count);
     }
 
     public void SetOpponentDeck(GameObject character)
     {
         opponentCharacters.Add(character);
+        Debug.Log("opponent count" + opponentCharacters.Count);
     }
 
     public void FetchBattleRecords(Action<List<BattleRecord>> callback)

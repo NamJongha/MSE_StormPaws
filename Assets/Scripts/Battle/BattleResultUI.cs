@@ -27,7 +27,7 @@ public class BattleResultUI : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(FetchBattleResult());
+        //StartCoroutine(FetchBattleResult());
     }
 
     private IEnumerator FetchBattleResult()
@@ -56,7 +56,7 @@ public class BattleResultUI : MonoBehaviour
         }
     }
 
-    private void SetUI(BattleResult result)
+    public void SetUI(BattleResult result)
     {
         resultText.text = result.result == "WIN" ? "WIN!" : "Lose...";
         weatherText.text = $"Weather: {result.weather}";

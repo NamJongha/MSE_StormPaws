@@ -81,6 +81,7 @@ public class AISimulationManager : MonoBehaviour
             ui.selectButton.onClick.RemoveAllListeners();
             ui.selectButton.onClick.AddListener(() => {
                 selectedMyDeck = myDecks[captured];
+                PlayerPrefs.SetString("SelectedMyDeckId", selectedMyDeck.id);//추가
 
                 if (currentMyDeckHighlight != null)
                 {
@@ -127,6 +128,8 @@ public class AISimulationManager : MonoBehaviour
             ui.selectButton.onClick.RemoveAllListeners();
             ui.selectButton.onClick.AddListener(() => {
                 selectedAIDeck = aiDecks[captured];
+                PlayerPrefs.SetString("SelectedOpponentDeckId", selectedAIDeck.id); //추가
+                //Opponent Id는 어떻게 가져올 것인가?
 
                 if (currentAIDeckHighlight != null)
                 {
