@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class DeckService
 {
@@ -15,7 +17,7 @@ public class DeckService
     public void FetchAllCards(Action<List<Card>> callback)
     {
         GameManager.Instance.StartCoroutine(
-            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=10",
+            GameManager.Instance.GetRequest($"{GameManager.Instance.baseUrl}/cards?page=1&size=100",
             (json) =>
             {
                 CardListResponse wrapper = JsonUtility.FromJson<CardListResponse>(json);
@@ -104,4 +106,46 @@ public class DeckService
     {
         cachedDeckPresets = null;
     }
+
+    public void DeleteDecks(List<string> deckIds, Action<List<DeckPreset>> onComplete = null)
+    {
+        GameManager.Instance.StartCoroutine(DeleteDecksCoroutine(deckIds, onComplete));
+    }
+
+    private IEnumerator DeleteDecksCoroutine(List<string> deckIds, Action<List<DeckPreset>> onComplete = null)
+    {
+        string url = $"{GameManager.Instance.baseUrl}/user/me/decks";
+
+        var requestBody = new DeleteDeckRequest { deckIds = deckIds };
+        string json = JsonUtility.ToJson(requestBody);
+
+        UnityWebRequest request = new UnityWebRequest(url, "DELETE");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Deck(s) deleted");
+
+            ClearDeckCache();
+            FetchDeckPresets(onComplete);
+        }
+        else
+        {
+            Debug.LogError("Delete failed: " + request.error);
+        }
+    }
+
+    [Serializable]
+    private class DeleteDeckRequest
+    {
+        public List<string> deckIds;
+    }
+
 }

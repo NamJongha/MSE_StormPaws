@@ -38,6 +38,11 @@ public class BattleService
     private bool isBattleOver = false;
     private string weatherId;
 
+    private Dictionary<GameObject, (HPBar bar, int currentHp, int maxHp)> hpBars = new();
+    private const int defaultMaxHp = 100;
+    private HPBar currentPlayerHPBar;
+    private HPBar currentOpponentHPBar;
+
     public void ResetState()
     {
         playerCharacterIndex = 0;
@@ -91,8 +96,6 @@ public class BattleService
             defenderDeckId = opponentDeckId,
             defenderUserId = opponentId,
             weatherLogId = weatherId,
-
-
         };
 
         string jsonData = JsonUtility.ToJson(requestData);
@@ -164,74 +167,73 @@ public class BattleService
      * -> This is for preventing that when each character is same, the Id is also same,
      * so the character will attack and hit twice at a time if it checks only character id.
      */
-
     //LJH: adding battle log
     private void TriggerAttack(string actorDeckId, int damage, int remainingHp)
     {
-        if (actorDeckId == playerDeckId)
-        {
-            if (remainingHp <= 0)
-            {
-                BattleUIHelper.Instance.Log("Opponent's No." + (opponentCharacterIndex + 1) + " character has fallen!");
-            }
-        }
-        else
-        {
-            if (remainingHp <= 0)
-            {
-                BattleUIHelper.Instance.Log("Your No." + (playerCharacterIndex + 1) + " character has fallen!");
-            }
-        }
+        ShowCurrentHPBar();
 
         if (actorDeckId == playerDeckId)
         {
-            Debug.Log("player attack" + damage);
-            //playerCharacters[playerCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            GameManager.Instance.StartCoroutine(ShowDamage(opponentCharacters[opponentCharacterIndex], damage, "opponent"));
-
-            if (remainingHp <= 0)
+            if (opponentCharacterIndex >= opponentCharacters.Count)
             {
-                Debug.Log("character dead");
-                opponentCharacters[opponentCharacterIndex].SetActive(false);
-
-                if (opponentCharacterIndex < 5)//if character is still left
-                {
-                    opponentCharacterIndex += 1;
-                    if(opponentCharacterIndex >= 5)
-                    {
-                        Debug.Log("Battle Ended");
-                        //end battle
-                        isBattleOver = true;
-                    }
-                }      
+                Debug.LogWarning("❗️opponentCharacterIndex out of range");
+                return;
             }
-        }
-        else
-        {
-            Debug.Log("opponent attack" + damage);
-            //opponentCharacters[opponentCharacterIndex].GetComponent<Animator>().SetTrigger("Attack");
-            GameManager.Instance.StartCoroutine(ShowDamage(playerCharacters[playerCharacterIndex], damage, "player"));
+
+            GameObject unit = opponentCharacters[opponentCharacterIndex];
+
+            Debug.Log("player attack " + damage);
+            GameManager.Instance.StartCoroutine(ShowDamage(unit, damage, "opponent"));
+            UpdateHP(unit, remainingHp);
+
             if (remainingHp <= 0)
             {
-                Debug.Log("character dead");
-                playerCharacters[playerCharacterIndex].SetActive(false);
+                BattleUIHelper.Instance.Log($"Opponent's No.{opponentCharacterIndex + 1} character has fallen!");
+                Debug.Log("Opponent character dead");
+                unit.SetActive(false);
 
-                if (playerCharacterIndex < 5)
+                if (hpBars.TryGetValue(unit, out var data))
+                    data.bar.gameObject.SetActive(false);
+
+                opponentCharacterIndex++;
+                if (opponentCharacterIndex >= opponentCharacters.Count)
                 {
-                    playerCharacterIndex += 1;
-                    if(playerCharacterIndex >= 5)
-                    {
-                        {
-                            Debug.Log("Battle Ended");
-                            //end battle
-                            isBattleOver = true;
-                        }
-                    }
+                    Debug.Log("Battle Ended");
+                    isBattleOver = true;
                 }
             }
         }
+        else
+        {
+            if (playerCharacterIndex >= playerCharacters.Count)
+            {
+                Debug.LogWarning("❗️playerCharacterIndex out of range");
+                return;
+            }
 
-        // Effect addable below here
+            GameObject unit = playerCharacters[playerCharacterIndex];
+
+            Debug.Log("opponent attack " + damage);
+            GameManager.Instance.StartCoroutine(ShowDamage(unit, damage, "player"));
+            UpdateHP(unit, remainingHp);
+
+            if (remainingHp <= 0)
+            {
+                BattleUIHelper.Instance.Log($"Your No.{playerCharacterIndex + 1} character has fallen!");
+                Debug.Log("Player character dead");
+                unit.SetActive(false);
+
+                if (hpBars.TryGetValue(unit, out var data))
+                    data.bar.gameObject.SetActive(false);
+
+                playerCharacterIndex++;
+                if (playerCharacterIndex >= playerCharacters.Count)
+                {
+                    Debug.Log("Battle Ended");
+                    isBattleOver = true;
+                }
+            }
+        }
     }
 
     public void SetDamageTextObjects(GameObject playerText, GameObject opponentText)
@@ -260,6 +262,52 @@ public class BattleService
         }
     }
 
+    public void RegisterHPBar(GameObject unit, HPBar bar)
+    {
+        bar.SetHP(defaultMaxHp, defaultMaxHp);
+        bar.gameObject.SetActive(false);
+        hpBars[unit] = (bar, defaultMaxHp, defaultMaxHp);
+    }
+
+    private void UpdateHP(GameObject unit, int newHp)
+    {
+        if (hpBars.TryGetValue(unit, out var data))
+        {
+            data.bar.SetHP(newHp, data.maxHp);
+            hpBars[unit] = (data.bar, newHp, data.maxHp);
+        }
+    }
+
+    void ShowCurrentHPBar()
+    {
+        if (playerCharacterIndex < playerCharacters.Count)
+        {
+            var unit = playerCharacters[playerCharacterIndex];
+            if (hpBars.TryGetValue(unit, out var data))
+            {
+                if (currentPlayerHPBar != null)
+                    currentPlayerHPBar.gameObject.SetActive(false);
+
+                currentPlayerHPBar = data.bar;
+                currentPlayerHPBar.gameObject.SetActive(true);
+            }
+        }
+
+        if (opponentCharacterIndex < opponentCharacters.Count)
+        {
+            var unit = opponentCharacters[opponentCharacterIndex];
+            if (hpBars.TryGetValue(unit, out var data))
+            {
+                if (currentOpponentHPBar != null)
+                    currentOpponentHPBar.gameObject.SetActive(false);
+
+                currentOpponentHPBar = data.bar;
+                currentOpponentHPBar.gameObject.SetActive(true);
+            }
+        }
+    }
+
+
     public void SetMyDeck(GameObject character)
     {
         playerCharacters.Add(character);
@@ -272,7 +320,7 @@ public class BattleService
 
     public void FetchBattleRecords(Action<List<BattleRecord>> callback)
     {
-        string url = $"{GameManager.Instance.baseUrl}/battles/records/me";
+        string url = $"{GameManager.Instance.baseUrl}/battles/records/me?page=1&size=100";
 
         GameManager.Instance.StartCoroutine(GameManager.Instance.GetRequest(url, (json) =>
         {

@@ -54,8 +54,6 @@ public class DeckManager : MonoBehaviour
             {
                 ui.SetDeck(i, deck);
                 string deckId = deck.id;
-                //ui.deleteButton.onClick.RemoveAllListeners();
-                //ui.deleteButton.onClick.AddListener(() => DeleteDeck(deckId));
 
                 if (deckDisplay != null)
                 {
@@ -259,9 +257,4 @@ public class DeckManager : MonoBehaviour
             Debug.LogError("Fail: " + request.error);
         }
     }
-
-    //public void DeleteDeck(string deckId)
-    //{
-    //    GameManager.Instance.DeckService.DeleteDeck(deckId, DisplayDeckList);
-    //}
 }

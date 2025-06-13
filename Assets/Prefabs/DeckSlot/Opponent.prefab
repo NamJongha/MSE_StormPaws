@@ -214,7 +214,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3301376321743224490, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
       propertyPath: m_Name
-      value: OpponentList Variant
+      value: Opponent
       objectReference: {fileID: 0}
     - target: {fileID: 3890921347756419862, guid: 2f3af86a399cfc743a84923bf700becf, type: 3}
       propertyPath: m_Pivot.x

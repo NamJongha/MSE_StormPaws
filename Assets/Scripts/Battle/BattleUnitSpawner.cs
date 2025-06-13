@@ -12,6 +12,9 @@ public class BattleUnitSpawner : MonoBehaviour
     public Transform[] mySpawnPoints;
     public Transform[] opponentSpawnPoints;
 
+    public GameObject hpBarPrefab;
+    public Transform canvasTransform;
+
     private Dictionary<string, string> modelMap = new Dictionary<string, string>
     {
         { "°³±¸¸®", "Frog" },
@@ -51,6 +54,11 @@ public class BattleUnitSpawner : MonoBehaviour
                     Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
                     GameObject unit = Instantiate(prefab, mySpawnPoints[i].position, rotation);
                     GameManager.Instance.BattleService.SetMyDeck(unit);
+
+                    GameObject hpBar = Instantiate(hpBarPrefab, canvasTransform);
+                    var hpBarScript = hpBar.GetComponent<HPBar>();
+                    hpBarScript.SetTarget(unit.transform);
+                    GameManager.Instance.BattleService.RegisterHPBar(unit, hpBarScript);
                 }
                 else
                 {
@@ -76,6 +84,11 @@ public class BattleUnitSpawner : MonoBehaviour
                     Quaternion rotation = Quaternion.Euler(0, 180f, 0f);
                     GameObject unit = Instantiate(prefab, opponentSpawnPoints[i].position, rotation);
                     GameManager.Instance.BattleService.SetOpponentDeck(unit);
+
+                    GameObject hpBar = Instantiate(hpBarPrefab, canvasTransform);
+                    var hpBarScript = hpBar.GetComponent<HPBar>();
+                    hpBarScript.SetTarget(unit.transform);
+                    GameManager.Instance.BattleService.RegisterHPBar(unit, hpBarScript);
                 }
                 else
                 {

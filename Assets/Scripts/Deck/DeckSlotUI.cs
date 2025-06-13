@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,8 +12,8 @@ public class DeckSlotUI : MonoBehaviour
     public Image[] animalImages;
     public TMP_Text[] animalNames;
 
-    public Button deleteButton;
     public Button selectButton;
+    public Button deleteButton;
 
     public void SetDeck(int index, DeckPreset deck)
     {
@@ -36,6 +38,24 @@ public class DeckSlotUI : MonoBehaviour
                 animalImages[i].sprite = null;
                 animalImages[i].gameObject.SetActive(false);
             }
+        }
+
+        if (deleteButton != null)
+        {
+            deleteButton.onClick.RemoveAllListeners();
+            deleteButton.onClick.AddListener(() =>
+            {
+                GameManager.Instance.DeckService.DeleteDecks(
+                    new List<string> { deck.id },
+                    updatedDecks =>
+                    {
+                        DeckManager deckManager = FindAnyObjectByType<DeckManager>();
+                        if (deckManager != null)
+                        {
+                            deckManager.DisplayDeckList(updatedDecks);
+                        }
+                    });
+            });
         }
     }
 }
