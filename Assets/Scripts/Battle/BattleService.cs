@@ -217,7 +217,7 @@ public class BattleService
                 if (opponentCharacterIndex < 5)//if character is still left
                 {
                     opponentCharacterIndex += 1;
-                    if(opponentCharacterIndex >= 5)
+                    if (opponentCharacterIndex >= 5)
                     {
                         Debug.Log("Battle Ended");
                         //end battle
@@ -225,7 +225,7 @@ public class BattleService
                         GameManager.Instance.StartCoroutine(ShowResult());
 
                     }
-                }      
+                }
             }
         }
         else
@@ -241,7 +241,7 @@ public class BattleService
                 if (playerCharacterIndex < 5)
                 {
                     playerCharacterIndex += 1;
-                    if(playerCharacterIndex >= 5)
+                    if (playerCharacterIndex >= 5)
                     {
                         {
                             Debug.Log("Battle Ended");
@@ -299,7 +299,7 @@ public class BattleService
         else
         {
             //opponentDamage.transform.position = target.transform.position + new Vector3(0, 1, 0); //height offset
-            opponentDamage.GetComponent<TMP_Text>().text =  "-" + damage.ToString();
+            opponentDamage.GetComponent<TMP_Text>().text = "-" + damage.ToString();
             opponentDamage.SetActive(true);
             yield return new WaitForSeconds(2f);
             opponentDamage.SetActive(false);
@@ -322,7 +322,7 @@ public class BattleService
         opponentDamage = opponentText;
     }
 
-    
+
 
     public void SetMyDeck(GameObject character)
     {

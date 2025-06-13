@@ -498,7 +498,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 204058407}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.60046434
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -575,7 +575,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1107, y: -0.000020266}
+  m_AnchoredPosition: {x: -1144, y: -0.000020266}
   m_SizeDelta: {x: 208.1131, y: 123.0187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &50734733
@@ -1060,7 +1060,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 614244397}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.39953566}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -1504,6 +1504,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 328890892}
+  - component: {fileID: 328890894}
+  - component: {fileID: 328890893}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -1526,10 +1528,50 @@ RectTransform:
   m_Father: {fileID: 7085821}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 300}
+  m_AnchorMax: {x: 0.48900002, y: 1}
+  m_AnchoredPosition: {x: 0.00009245357, y: -0.0004820049}
+  m_SizeDelta: {x: -89.48701, y: 0}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &328890893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328890891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 184
+    m_Right: 0
+    m_Top: -133
+    m_Bottom: 0
+  m_ChildAlignment: 1
+  m_Spacing: -277
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &328890894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328890891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -2617,7 +2659,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 544, y: -0.000020266}
+  m_AnchoredPosition: {x: 669, y: -0.000020266}
   m_SizeDelta: {x: 463.6783, y: 123.0187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &475245060
@@ -2905,7 +2947,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -29, y: -0.000020266}
+  m_AnchoredPosition: {x: 154, y: -0.000020266}
   m_SizeDelta: {x: 463.6783, y: 123.0187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &629443334
@@ -3543,7 +3585,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -697, y: -0.000020266}
+  m_AnchoredPosition: {x: -459, y: -0.000020266}
   m_SizeDelta: {x: 463.6783, y: 123.0187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &774226757
@@ -3631,7 +3673,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -0.00024414062, w: 0}
+  m_margin: {x: 0, y: 0, z: 3.826339, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -5606,7 +5648,7 @@ MonoBehaviour:
   - icon: {fileID: 1377989561}
     nameText: {fileID: 1031206706}
   createDeckPanel: {fileID: 961215862}
-  animalButtonPrefab: {fileID: 2660360997199180310, guid: aaafca5ef69c97c4d98a4a6ade39d9fb, type: 3}
+  animalButtonPrefab: {fileID: 2660360997199180310, guid: 00291752fc2b7274495368c4a799d3ad, type: 3}
   animalButtonContainer: {fileID: 984747874}
   deckSlotContainer: {fileID: 1377262844}
   deckSlotPrefab: {fileID: 3301376321743224490, guid: 31fc84a9cfaff504aac8d9cd6d204736, type: 3}
@@ -5626,8 +5668,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleRecordPrefab: {fileID: 1178683253218416556, guid: d1cfa89db6057c44b8ab31bbdb7805da, type: 3}
   battleRecordContainer: {fileID: 328890892}
-  detailPanel: {fileID: 0}
-  detailText: {fileID: 0}
 --- !u!114 &1386371112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5821,6 +5861,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1386371103}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -6489,7 +6541,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 982, y: -0.000020266}
+  m_AnchoredPosition: {x: 1055, y: -0.000020266}
   m_SizeDelta: {x: 463.6783, y: 123.0187}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1660550884
@@ -6577,7 +6629,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -0.00024414062, w: 0}
+  m_margin: {x: 0, y: 0, z: 24.531174, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

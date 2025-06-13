@@ -44,10 +44,14 @@ public static class LanguageTranslate
         foreach (var pair in translations)
         {
             if (CurrentLanguage == Language.Korean && inputName == pair.Key)
+            {
                 return pair.Value.Korean;
+            }
 
             if (CurrentLanguage == Language.English && inputName == pair.Value.Korean)
+            {
                 return pair.Value.English;
+            }
         }
 
         return inputName; // fallback

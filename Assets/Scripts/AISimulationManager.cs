@@ -129,7 +129,7 @@ public class AISimulationManager : MonoBehaviour
             ui.selectButton.onClick.AddListener(() => {
                 selectedAIDeck = aiDecks[captured];
                 PlayerPrefs.SetString("SelectedOpponentDeckId", selectedAIDeck.id); //추가
-                //Opponent Id는 어떻게 가져올 것인가?
+                PlayerPrefs.SetString("SelectedOpponentUserId", selectedAIDeck.user.id);
 
                 if (currentAIDeckHighlight != null)
                 {

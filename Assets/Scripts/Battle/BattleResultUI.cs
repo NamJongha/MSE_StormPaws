@@ -77,6 +77,8 @@ public class BattleResultUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        int xValueOffset = -300;
+
         foreach (DeckCard deckCard in deckList)
         {
             GameObject slot = Instantiate(cardPreviewSlotPrefab, container);
@@ -85,6 +87,10 @@ public class BattleResultUI : MonoBehaviour
 
             string cardName = deckCard.card.name;
             icon.sprite = GameManager.Instance.SpriteLoader.Load(cardName);
+            slot.GetComponent<RectTransform>().position = container.GetComponent<RectTransform>().position + new Vector3(xValueOffset, 0, 0);
+            slot.transform.localScale = new Vector3(3, 3, 3);
+            Debug.Log(slot.GetComponent<RectTransform>().position);
+            xValueOffset += 150;
             name.text = cardName;
         }
     }
