@@ -63,58 +63,80 @@ public class BattleManager : MonoBehaviour
 
         if (isAISimulation)
         {
+            Debug.Log("StartAIBattle");
             string weather = PlayerPrefs.GetString("SimulatedWeather", "CLEAR").ToUpper();
 
             BattleEnvData env = new BattleEnvData { weatherType = weather, city = "Simulation" };
             OnEnvironmentReceived(env);
 
-            StartCoroutine(GameManager.Instance.BattleService.FetchBattleSimulationLog());
+            weatherMap.TryGetValue(weather, out string value);
+            PlayerPrefs.SetString("SimulatedWeatherId", value);
+
+            StartCoroutine(FetchEnvironmentThenStartSimulation(true, env));
         }
         else
         {
             Debug.Log("fetch weather");
-            StartCoroutine(FetchEnvironmentThenStartSimulation());
+            StartCoroutine(FetchEnvironmentThenStartSimulation(false, null));
         }
     }
 
-    private IEnumerator FetchEnvironmentThenStartSimulation()
+    private IEnumerator FetchEnvironmentThenStartSimulation(bool isAISimulation, BattleEnvData weatherData)
     {
-        BattleEnvData fetchedEnv = null;
-        bool isDone = false;
-
-        yield return GameManager.Instance.StartCoroutine(
-            GameManager.Instance.BattleService.FetchBattleEnvironment(
-                (env) =>
-                {
-                    fetchedEnv = env;
-                    isDone = true;
-                },
-                (error) =>
-                {
-                    Debug.LogError("Fail: " + error);
-                    isDone = true;
-                }
-            )
-        );
-
-        while (!isDone) yield return null;
-
-        if (fetchedEnv != null)
+        if (!isAISimulation)
         {
-            fetchedEnv.weatherType = fetchedEnv.weatherType?.ToUpper();
-            OnEnvironmentReceived(fetchedEnv);
+            BattleEnvData fetchedEnv = null;
+            bool isDone = false;
 
-            weatherText.text = fetchedEnv.weatherType;
-            cityText.text = fetchedEnv.city;
+            yield return GameManager.Instance.StartCoroutine(
+                GameManager.Instance.BattleService.FetchBattleEnvironment(
+                    (env) =>
+                    {
+                        fetchedEnv = env;
+                        isDone = true;
+                    },
+                    (error) =>
+                    {
+                        Debug.LogError("Fail: " + error);
+                        isDone = true;
+                    }
+                )
+            );
+
+            while (!isDone) yield return null;
+
+            if (fetchedEnv != null)
+            {
+                fetchedEnv.weatherType = fetchedEnv.weatherType?.ToUpper();
+                OnEnvironmentReceived(fetchedEnv);
+
+                weatherText.text = fetchedEnv.weatherType;
+                cityText.text = fetchedEnv.city;
+
+                introGroup.SetActive(true);
+                yield return new WaitForSeconds(2.5f);
+                introGroup.SetActive(false);
+            }
+
+            yield return GameManager.Instance.StartCoroutine(
+                GameManager.Instance.BattleService.FetchBattleSimulationLog(false)
+            );
+        }
+        else
+        {
+            OnEnvironmentReceived(weatherData);
+
+            weatherText.text = weatherData.weatherType;
+            cityText.text = weatherData.city;
 
             introGroup.SetActive(true);
             yield return new WaitForSeconds(2.5f);
             introGroup.SetActive(false);
-        }
 
-        yield return GameManager.Instance.StartCoroutine(
-            GameManager.Instance.BattleService.FetchBattleSimulationLog()
-        );
+            yield return GameManager.Instance.StartCoroutine(
+                GameManager.Instance.BattleService.FetchBattleSimulationLog(true)
+            );
+        }
     }
 
     private void OnEnvironmentReceived(BattleEnvData env)

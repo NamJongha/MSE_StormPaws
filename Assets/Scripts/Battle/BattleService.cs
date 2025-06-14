@@ -88,7 +88,7 @@ public class BattleService
     }
 
     //get battle simulation result
-    public IEnumerator FetchBattleSimulationLog()
+    public IEnumerator FetchBattleSimulationLog(bool isSimulation)
     {
         Debug.Log("Start Battle");
 
@@ -106,6 +106,11 @@ public class BattleService
             defenderUserId = opponentId,
             weatherLogId = weatherId,
         };
+
+        if (isSimulation)
+        {
+            requestData.weatherLogId = PlayerPrefs.GetString("SimulatedWeatherId", "");
+        }
 
         string jsonData = JsonUtility.ToJson(requestData);
         //Debug.Log(jsonData);
@@ -128,6 +133,7 @@ public class BattleService
             //change result json into meaningful data
             string json = request.downloadHandler.text;
             BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
+            Debug.Log(battleSimulation.data.logs);
             GameManager.Instance.StartCoroutine(PlayBattleSimulation(battleSimulation.data.logs));
         }
         else
