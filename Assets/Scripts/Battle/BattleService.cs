@@ -77,7 +77,6 @@ public class BattleService
     {
         string url = $"{GameManager.Instance.baseUrl}/weather/random";
         UnityWebRequest request = UnityWebRequest.Get(url);
-        //TokenManager.SendServerToken(request);
         request.SetRequestHeader("Authorization", "Bearer " + GameManager.Instance.GetAuthToken());
 
         yield return request.SendWebRequest();
@@ -100,27 +99,20 @@ public class BattleService
     {
         Debug.Log("Start Battle");
 
-        // Read IDs from PlayerPrefs
         playerDeckId = PlayerPrefs.GetString("SelectedMyDeckId", "");
         opponentDeckId = PlayerPrefs.GetString("SelectedOpponentDeckId", "");
 
         playerId = PlayerPrefs.GetString("PlayerId", "");
         opponentId = PlayerPrefs.GetString("SelectedOpponentUserId", "");
 
-        // Prepare battle request
         BattleRequestDto requestData = new BattleRequestDto
         {
             attackerDeckId = playerDeckId,
             attackerUserId = playerId,
             defenderDeckId = opponentDeckId,
             defenderUserId = opponentId,
-            weatherLogId = weatherId,
+            weatherLogId = isSimulation ? PlayerPrefs.GetString("SimulatedWeatherId", "") : weatherId
         };
-
-        if (isSimulation)
-        {
-            requestData.weatherLogId = PlayerPrefs.GetString("SimulatedWeatherId", "");
-        }
 
         string jsonData = JsonUtility.ToJson(requestData);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
@@ -137,11 +129,14 @@ public class BattleService
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            //change result json into meaningful data
-            string json = request.downloadHandler.text;
-            BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(json);
-            Debug.Log(battleSimulation.data.logs);
-            winnerId = battleSimulation.data.winnerId;
+            string fullJson = request.downloadHandler.text;
+            Debug.Log("[RAW JSON] " + fullJson);
+
+            BattleSimulationLog battleSimulation = JsonUtility.FromJson<BattleSimulationLog>(fullJson);
+
+            battleSimulation.data.result = battleSimulation.data.winnerDeckId == playerDeckId ? "WIN" : "LOSE";
+            winnerId = battleSimulation.data.winnerDeckId;
+
             GameManager.Instance.StartCoroutine(PlayBattleSimulation(battleSimulation.data.logs));
         }
         else
@@ -151,7 +146,6 @@ public class BattleService
             Debug.Log($"Error Message: {request.downloadHandler.text}");
         }
     }
-
 
     // Play the simulation log step by step
     //check the timestamp in log and do acutal attack according to the log /njh
@@ -489,8 +483,9 @@ public class BattleEnvData
 [System.Serializable]
 public class BattleData
 {
-    public string winnerId;
+    public string winnerDeckId;
     public List<BattleLog> logs;
+    public string result;
 }
 
 
